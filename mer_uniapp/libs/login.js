@@ -215,6 +215,7 @@ function getSafeUrlParam(key) {
 
 
 export async function checkTgMiniAppLogin() {
+	
     try {
      // 1. 优先从 Telegram 参数获取 id
 	         console.log('[checkTgMiniAppLogin] 开始执行');
