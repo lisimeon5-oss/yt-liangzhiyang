@@ -70,7 +70,7 @@ public class LoginController {
     }
 
     /**
-     * 自动登录-需加白名单（未使用）
+     * 自动登录 - 需加白名单（未使用）
      */
     @ApiOperation(value = "自动登录")
     @RequestMapping(value = "/auto", method = RequestMethod.POST)
