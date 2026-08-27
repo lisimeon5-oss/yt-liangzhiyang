@@ -18,7 +18,7 @@
 			<!-- #endif -->
 			<!-- #ifdef H5 -->
 			<view id="home" class="home acea-row row-center-wrapper iconfont icon-fanhui2 h5_back"
-				:style="{ top: homeTop + 'rpx'}" @tap="goToHome">
+				:style="{ top: homeTop + 'rpx'}" @tap="returns">
 			</view>
 			<view class="nav_title" :style="{ height:  '80rpx',lineHeight:  '80rpx', color:iconColor}">
 				{{navTitle}}

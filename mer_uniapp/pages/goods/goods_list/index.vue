@@ -259,7 +259,7 @@
 		onLoad: function(options) {
 			this.downPng = `${this.urlDomain}crmebimage/presets/down_red.png`;
 			this.upPng = `${this.urlDomain}crmebimage/presets/up_red.png`;
-			this.merId = options.merId ? Number(options.merId) : 0;
+			this.merId = Number(options.merId || options.merid) || 0;
 			this.$set(this, 'cid', Number(options.cid) || 0);
 			this.title = options.title || '';
 			this.$set(this, 'keyword', options.searchValue || '');

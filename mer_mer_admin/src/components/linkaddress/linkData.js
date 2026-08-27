@@ -15,7 +15,7 @@ export const linkData = {
       id: 2,
       type: 1,
       name: '商品列表',
-      url: `/pages/goods/goods_list/index?merid=${JavaMerchantId}`,
+      url: `/pages/goods/goods_list/index?merId=${JavaMerchantId}`,
     },
     {
       id: 3,
@@ -47,7 +47,7 @@ export const linkData = {
       id: 2,
       type: 1,
       name: '商品列表',
-      url: `/pages/goods/goods_list/index?merid=${JavaMerchantId}`,
+      url: `/pages/goods/goods_list/index?merId=${JavaMerchantId}`,
     },
   ]
 };
