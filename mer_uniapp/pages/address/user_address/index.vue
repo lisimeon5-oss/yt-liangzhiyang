@@ -21,12 +21,12 @@
 					<view class='item acea-row row-between-wrapper'>
 						<view class='name'>收货地址</view>
 						<view class="address">
-							<!--<view class="region_count" @click="changeRegion">
+							<view class="region_count" @click="changeRegion">
 								<text v-if="!addressInfo.length" style="color:#cdcdcd;">请选择地址</text>
 								<text v-else>{{addressText}}</text>
 								
-							</view>-->
-							<view>亚太(水沟谷)</view>
+							</view>
+							<!--<view>亚太(水沟谷)</view>-->
 						</view>
 						<text class="iconfont icon-xiangyou"></text>
 					</view>
@@ -281,7 +281,7 @@
 				if (!value.detail) return that.$util.Tips({
 					title: '请填写详细地址'
 				});
-				/*value.id = that.addressId;
+				value.id = that.addressId;
 				value.province = that.addressInfo[0].regionName;
 				value.provinceId = that.addressInfo[0].regionId;
 				value.city = that.addressInfo[1].regionName;
@@ -289,8 +289,8 @@
 				value.district = that.addressInfo[2].regionName;
 				value.districtId = that.addressInfo[2].regionId;
 				value.street = that.addressInfo.length>3?that.addressInfo[3].regionName:'';
-				value.isDefault = that.userAddress.isDefault;*/
-				value.id = that.addressId;
+				value.isDefault = that.userAddress.isDefault;
+				/*value.id = that.addressId;
 				value.province = '亚太';
 				value.provinceId = 0;
 				value.city = '(水沟谷)';
@@ -298,7 +298,7 @@
 				value.district = '-';
 				value.districtId = 0;
 				value.street = '-';
-				value.isDefault = that.userAddress.isDefault;
+				value.isDefault = that.userAddress.isDefault;*/
 
 				uni.showLoading({
 					title: '保存中',
