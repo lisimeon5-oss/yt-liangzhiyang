@@ -22,7 +22,7 @@
 						:key="index">
 						<view class="item">
 							<view class="pictrue skeleton-rect relative">
-								<view v-show="item.stock===0" class="sellOut">已售罄</view>
+								<view v-show="item.stock===0" class="sellOut">{{$t('已售罄')}}</view>
 								<easy-loadimage :image-src="item.image" :radius="dataConfig.contentStyle.val">
 								</easy-loadimage>
 							</view>
@@ -38,7 +38,7 @@
 			<view class="conter_y" :style="[{'grid-gap':itemStyle}]" v-if="listStyle == 1">
 				<view class="item" v-for="(item, index) in spikeList" :key="index">
 					<view class="pictrue relative">
-						<view v-show="item.stock===0" class="sellOut">已售罄</view>
+						<view v-show="item.stock===0" class="sellOut">{{$t('已售罄')}}</view>
 						<easy-loadimage :image-src="item.image" :radius="dataConfig.contentStyle.val">
 						</easy-loadimage>
 					</view>
@@ -78,6 +78,7 @@
 		getSeckillIndexApi
 	} from '@/api/activity.js';
 	import easyLoadimage from '@/components/base/easy-loadimage.vue';
+	import { getLocalizedDiyVal, getLocalizedDiyUrl } from '@/utils/localizedName';
 	export default {
 		name: 'homeSeckill',
 		props: {
@@ -131,11 +132,11 @@
 			},
 			//标题图片
 			logoUrl() {
-				return this.dataConfig.logoConfig.url
+				return getLocalizedDiyUrl(this.dataConfig.logoConfig, this.i18nLocale) ||
+					(this.dataConfig.logoConfig && this.dataConfig.logoConfig.url) || '';
 			},
-			//标题
 			titleText() {
-				return this.dataConfig.titleConfig.val
+				return getLocalizedDiyVal(this.dataConfig.titleConfig, this.i18nLocale);
 			},
 			//标题颜色
 			titleColor() {
@@ -152,7 +153,7 @@
 			//价格颜色
 			priceColor() {
 				return {
-					color: this.dataConfig.themeStyleConfig.tabVal?this.dataConfig.priceColor.color[0].item:this.themeColor
+					color: this.dataConfig.themeStyleConfig && this.dataConfig.themeStyleConfig.tabVal?this.dataConfig.priceColor.color[0].item:this.themeColor
 				};
 			},
 			//商品名称

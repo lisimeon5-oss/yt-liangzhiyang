@@ -46,11 +46,13 @@ import com.zbkj.common.result.CommonResultCode;
 import com.zbkj.common.result.OrderResultCode;
 import com.zbkj.common.utils.CrmebDateUtil;
 import com.zbkj.common.utils.CrmebUtil;
+import com.zbkj.common.utils.I18nJsonUtil;
 import com.zbkj.common.utils.RedisUtil;
 import com.zbkj.common.vo.*;
 import com.zbkj.front.service.FrontOrderService;
 import com.zbkj.front.service.SeckillService;
 import com.zbkj.service.service.*;
+import com.zbkj.service.service.OrderFrontI18nSupport;
 import com.zbkj.service.service.groupbuy.GroupBuyActivityService;
 import com.zbkj.service.service.groupbuy.GroupBuyActivitySkuService;
 import com.zbkj.service.service.groupbuy.GroupBuyRecordService;
@@ -163,6 +165,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private GroupBuyUserService groupBuyUserService;
     @Autowired
     private GroupBuyActivitySkuService groupBuyActivitySkuService;
+    @Autowired
+    private OrderFrontI18nSupport orderFrontI18nSupport;
 
     /**
      * 预下单V1.7
@@ -911,6 +915,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 infoResponseList.add(infoResponse);
             }
             preOrderResponse.setMerchantInfoList(infoResponseList);
+            orderFrontI18nSupport.applyPreMerchantInfoList(infoResponseList);
             return preOrderResponse;
         }
         List<Integer> merIdList = new ArrayList<>();
@@ -1148,6 +1153,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
 
         preOrderResponse.setPlatCouponUserList(platCouponUserList);
+        orderFrontI18nSupport.applyPreMerchantInfoList(infoResponseList);
         return preOrderResponse;
     }
 
@@ -1816,8 +1822,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             });
             infoResponse.setOrderInfoList(infoResponseList);
             if (order.getMerId() > 0) {
-                infoResponse.setMerName(merchantMap.get(order.getMerId()).getName());
+                infoResponse.setMerName(I18nJsonUtil.resolveMerchantName(merchantMap.get(order.getMerId())));
             }
+            orderFrontI18nSupport.applyOrderInfoList(infoResponseList);
             if (!order.getPaid()) {
                 cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
                 infoResponse.setCancelTime(cancelTime.getTime());
@@ -1887,7 +1894,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             BeanUtils.copyProperties(merchantOrder, merDetailResponse);
             if (!merchantOrder.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_INTEGRAL)) {
                 Merchant merchant = merchantService.getById(merchantOrder.getMerId());
-                merDetailResponse.setMerName(merchant.getName());
+                merDetailResponse.setMerName(I18nJsonUtil.resolveMerchantName(merchant));
                 if (merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_PICK_UP)) {
                     merDetailResponse.setMerPhone(merchant.getPhone());
                     merDetailResponse.setMerProvince(merchant.getProvince());
@@ -1920,6 +1927,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             merDetailResponseList.add(merDetailResponse);
         }
         response.setMerchantOrderList(merDetailResponseList);
+        orderFrontI18nSupport.applyOrderInfoList(merDetailResponseList.stream()
+                .filter(m -> CollUtil.isNotEmpty(m.getOrderInfoList()))
+                .flatMap(m -> m.getOrderInfoList().stream())
+                .collect(Collectors.toList()));
         if (!order.getPaid()) {
             DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
             response.setCancelTime(cancelTime.getTime());
@@ -1948,10 +1959,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         List<Integer> merIdList = orderDetailList.stream().map(OrderDetail::getMerId).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = merchantService.getMerIdMapByIdList(merIdList);
+        orderFrontI18nSupport.applyOrderDetails(orderDetailList);
         List<InfoReplyResponse> responseList = orderDetailList.stream().map(info -> {
             InfoReplyResponse replyResponse = new InfoReplyResponse();
             BeanUtils.copyProperties(info, replyResponse);
-            replyResponse.setMerName(merchantMap.get(info.getMerId()).getName());
+            replyResponse.setMerName(I18nJsonUtil.resolveMerchantName(merchantMap.get(info.getMerId())));
             replyResponse.setMerIsSelf(merchantMap.get(info.getMerId()).getIsSelf());
             return replyResponse;
         }).collect(Collectors.toList());
@@ -2125,8 +2137,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         List<Integer> merIdList = orderDetailList.stream().map(OrderDetail::getMerId).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
         orderDetailList.forEach(o -> {
-            o.setMerName(merchantMap.get(o.getMerId()).getName());
+            o.setMerName(I18nJsonUtil.resolveMerchantName(merchantMap.get(o.getMerId())));
         });
+        orderFrontI18nSupport.applyOrderDetails(orderDetailList);
         return pageInfo;
     }
 
@@ -2270,7 +2283,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public PageInfo<RefundOrderResponse> getRefundOrderList(OrderAfterSalesSearchRequest request) {
-        return refundOrderService.getH5List(request);
+        PageInfo<RefundOrderResponse> pageInfo = refundOrderService.getH5List(request);
+        if (pageInfo != null) {
+            orderFrontI18nSupport.applyRefundList(pageInfo.getList());
+        }
+        return pageInfo;
     }
 
     /**
@@ -2281,7 +2298,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public RefundOrderInfoResponse refundOrderDetail(String refundOrderNo) {
-        return refundOrderService.getRefundOrderDetailByRefundOrderNo(refundOrderNo);
+        RefundOrderInfoResponse response = refundOrderService.getRefundOrderDetailByRefundOrderNo(refundOrderNo);
+        orderFrontI18nSupport.applyRefundDetail(response);
+        return response;
     }
 
     /**
@@ -2835,7 +2854,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             merchantOrderVo.setIsSelf(false);
         } else {
             merchantOrderVo.setMerId(merchant.getId());
-            merchantOrderVo.setMerName(merchant.getName());
+            merchantOrderVo.setMerName(I18nJsonUtil.resolveMerchantName(merchant));
             merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
             merchantOrderVo.setIsSelf(merchant.getIsSelf());
         }
@@ -3381,7 +3400,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         PreMerchantOrderVo merchantOrderVo = new PreMerchantOrderVo();
         merchantOrderVo.setMerId(merchant.getId());
-        merchantOrderVo.setMerName(merchant.getName());
+        merchantOrderVo.setMerName(I18nJsonUtil.resolveMerchantName(merchant));
         merchantOrderVo.setFreightFee(BigDecimal.ZERO);
         merchantOrderVo.setCouponFee(BigDecimal.ZERO);
         merchantOrderVo.setUserCouponId(0);

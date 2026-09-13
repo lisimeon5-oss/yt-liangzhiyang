@@ -15,6 +15,7 @@
 	} from './api/api.js';
 	import Cache from './utils/cache.js';
 	import store from './store'
+	import { applyTabBar, getLocale, applyUniFrameworkLocale } from '@/i18n';
 	import {
 		silenceBindingSpread
 	} from "./utils";
@@ -57,6 +58,8 @@
 			store.dispatch('GetGlobalConfig');
 			//校验token是否有效,true为有效，false为无效
 			store.dispatch("GetTokenIsExist");
+			applyUniFrameworkLocale(getLocale());
+			applyTabBar();
 			
 			// 主题变色
 			getTheme().then(res => {

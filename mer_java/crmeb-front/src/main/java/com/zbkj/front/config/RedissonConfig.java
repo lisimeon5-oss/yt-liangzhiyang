@@ -1,10 +1,10 @@
 package com.zbkj.front.config;
 
+import cn.hutool.core.util.StrUtil;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,14 +16,13 @@ import org.springframework.context.annotation.Configuration;
  * @Version 1.0
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.redis.enabled", havingValue = "true")
 public class RedissonConfig {
 
     @Value("${spring.redis.host}")
     private String host;
     @Value("${spring.redis.port}")
     private String port;
-    @Value("${spring.redis.password}")
+    @Value("${spring.redis.password:}")
     private String password;
     @Value("${spring.redis.database}")
     private int database;
@@ -33,7 +32,9 @@ public class RedissonConfig {
         Config config = new Config();
         String address = "redis://" + host + ":" + port;
         config.useSingleServer().setAddress(address);
-        config.useSingleServer().setPassword(password);
+        if (StrUtil.isNotBlank(password)) {
+            config.useSingleServer().setPassword(password);
+        }
         config.useSingleServer().setDatabase(database);
         return Redisson.create(config);
     }

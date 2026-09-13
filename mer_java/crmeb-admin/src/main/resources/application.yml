@@ -53,7 +53,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/lzy_java_mer?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowPublicKeyRetrieval=true
+    url: "jdbc:mysql://127.0.0.1:3306/lzy_java_mer?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimeZone=GMT+8&sessionVariables=sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'"
     username: root
     password: 123456
   # quartz

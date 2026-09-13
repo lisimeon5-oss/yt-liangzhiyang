@@ -36,6 +36,9 @@ public class GroupBuyActivity implements Serializable {
     @ApiModelProperty(value = "拼团活动名称")
     private String groupName;
 
+    @ApiModelProperty(value = "多语言拼团活动名称(JSON)")
+    private String groupNameJson;
+
     @ApiModelProperty(value = "开始时间")
     private Date startTime;
 
@@ -93,8 +96,10 @@ public class GroupBuyActivity implements Serializable {
     @ApiModelProperty(value = "活动状态:0关闭，1开启")
     private Integer activityStatus;
 
+
     @ApiModelProperty(value = "允许最大开团数: 0-无限制")
     private Integer maxGroupLimit;
+
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;

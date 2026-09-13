@@ -18,7 +18,7 @@
 			<!-- #endif -->
 			<!-- #ifdef H5 -->
 			<view id="home" class="home acea-row row-center-wrapper iconfont icon-fanhui2 h5_back"
-				:style="{ top: homeTop + 'rpx'}" @tap="returns">
+				:style="{ top: homeTop + 'rpx'}" @tap="goToHome">
 			</view>
 			<view class="nav_title" :style="{ height:  '80rpx',lineHeight:  '80rpx', color:iconColor}">
 				{{navTitle}}
@@ -44,7 +44,7 @@
 			<view class="dialog_nav_item" v-for="(item,index) in selectNavList" :key="index"
 				@click="linkPage(item.url)">
 				<text class="iconfont" :class="item.icon"></text>
-				<text class="pl-20">{{item.name}}</text>
+				<text class="pl-20">{{$t(item.name)}}</text>
 			</view>
 		</view>
 		<view v-if="isHeight" :style="{ height: `${navH}rpx` }"></view>

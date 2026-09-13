@@ -7,7 +7,7 @@
 		</view>
 		
 		<view v-if="userIsPaidMember && productPrice.isPaidMember&&!productPrice.groupPrice" class="svip-icon hidden acea-row row-middle" :style="[svipIconStyle.svipBox]">
-			<view :style="[svipIconStyle.svipPrice]">SVIP会员价</view>
+			<view :style="[svipIconStyle.svipPrice]">{{$t('SVIP会员价')}}</view>
 		</view>
 		
 		<view v-if="!userIsPaidMember && paidMemberPriceDisplay==='all' && productPrice.isPaidMember&&!productPrice.groupPrice" class="svip-price hidden acea-row row-middle" :style="[svipPriceStyle.svipBox]">
