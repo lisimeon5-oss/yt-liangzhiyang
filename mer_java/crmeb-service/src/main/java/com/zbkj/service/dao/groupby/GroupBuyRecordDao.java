@@ -6,6 +6,7 @@ import com.zbkj.common.model.groupbuy.GroupBuyRecord;
 import com.zbkj.common.response.groupbuy.GroupBuyActivityRecordAdminListResponse;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +23,12 @@ public interface GroupBuyRecordDao extends BaseMapper<GroupBuyRecord> {
     List<GroupBuyActivityRecordAdminListResponse> findAdminList(HashMap<String, Object> map);
 
     Integer getAdminListHeaderCount(HashMap<String, Object> map);
+
+    /**
+     * 统计当前活动周期内已经开过的团。失败团也计入开团次数，防止反复开团绕过上限。
+     */
+    Integer countOpenedGroupsInCurrentRound(@Param("activityId") Integer activityId,
+                                            @Param("roundStartTime") Date roundStartTime);
 
     /**
      *  根据条件查询当前用户在当前活动中还可以参与的拼团活动

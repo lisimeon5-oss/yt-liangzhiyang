@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zbkj.service.dao.groupby.GroupBuyRecordDao">
 
+    <select id="countOpenedGroupsInCurrentRound" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM eb_group_buy_record
+        WHERE group_activity_id = #{activityId}
+          AND is_del = 0
+          AND create_time <![CDATA[>=]]> #{roundStartTime}
+    </select>
+
     <select id="findAdminList" resultType="com.zbkj.common.response.groupbuy.GroupBuyActivityRecordAdminListResponse" parameterType="Map">
         SELECT gbr.group_buying_id as groupBuyingId,gbr.group_leader_uid as groupLeaderUid,gbr.buying_count_num as buyingCountNum,
                gbr.create_time as createTime,gbr.end_time as endTime,gbr.yet_buying_num as yetBuyingNum,

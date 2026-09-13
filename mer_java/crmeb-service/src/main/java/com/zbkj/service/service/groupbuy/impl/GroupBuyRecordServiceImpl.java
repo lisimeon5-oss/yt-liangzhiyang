@@ -46,6 +46,7 @@ import com.zbkj.common.response.groupbuy.*;
 import com.zbkj.common.result.CommonResultCode;
 import com.zbkj.common.utils.*;
 import com.zbkj.common.vo.*;
+import com.zbkj.service.dao.groupby.GroupBuyActivityDao;
 import com.zbkj.service.dao.groupby.GroupBuyRecordDao;
 import com.zbkj.service.service.*;
 import com.zbkj.service.service.groupbuy.GroupBuyActivityService;
@@ -56,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -79,6 +81,8 @@ public class GroupBuyRecordServiceImpl extends ServiceImpl<GroupBuyRecordDao, Gr
     private final Logger logger = LoggerFactory.getLogger(GroupBuyRecordServiceImpl.class);
     @Resource
     private GroupBuyRecordDao dao;
+    @Resource
+    private GroupBuyActivityDao groupBuyActivityDao;
     @Autowired
     private GroupBuyActivityService groupBuyActivityService;
     @Autowired
@@ -496,6 +500,7 @@ public class GroupBuyRecordServiceImpl extends ServiceImpl<GroupBuyRecordDao, Gr
      * @param merId 商户id
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public GroupBuyRecord newGroupBuyRecordOrContinueBuy(String orderNo, Integer payNum, Integer groupActivityId,
                                                          Integer groupProductId, Integer groupBuyRecordId, Integer fictiStatus, Integer merId,
                                                          Integer skuid, Integer uid, String nickname, String avatar) {
@@ -503,6 +508,23 @@ public class GroupBuyRecordServiceImpl extends ServiceImpl<GroupBuyRecordDao, Gr
         GroupBuyActivity currentActivity = groupBuyActivityService.getById(groupActivityId);
         // 开团
         if(groupBuyRecordId == 0){
+            // 预下单阶段的分布式锁仅用于提前提示；真正开团时必须在同一事务内
+            // 锁定活动行，再完成计数和插入，避免并发请求突破最大开团数。
+            currentActivity = groupBuyActivityDao.selectByIdForUpdate(groupActivityId);
+            if (ObjectUtil.isNull(currentActivity) || currentActivity.getIsDel() == 1) {
+                throw new CrmebException("拼团活动不存在");
+            }
+            if (!Integer.valueOf(1).equals(currentActivity.getActivityStatus())) {
+                throw new CrmebException("拼团活动已关闭");
+            }
+            Integer maxGroupLimit = currentActivity.getMaxGroupLimit();
+            if (ObjectUtil.isNotNull(maxGroupLimit) && maxGroupLimit > 0) {
+                Integer openedCount = dao.countOpenedGroupsInCurrentRound(
+                        groupActivityId, currentActivity.getStartTime());
+                if (openedCount >= maxGroupLimit) {
+                    throw new CrmebException("本活动开团名额已满，可加入其他拼团");
+                }
+            }
             currentActivity.setTotalActivityBegin(currentActivity.getTotalActivityBegin() + 1); // 拼团活动 开团数 统计
 
             record = new GroupBuyRecord();

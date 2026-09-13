@@ -303,20 +303,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             if (!locked) {
                                 throw new CrmebException("当前开团人数过多，请重试");
                             }
-                            Date startOfDay = DateUtil.beginOfDay(new Date());
-                            Date endOfDay = DateUtil.endOfDay(new Date());
-                            Integer todayUserGroups = groupBuyRecordService.getBaseMapper().selectCount(
+                            Integer openedCount = groupBuyRecordService.getBaseMapper().selectCount(
                                     new LambdaQueryWrapper<GroupBuyRecord>()
                                             .eq(GroupBuyRecord::getGroupActivityId, ov.getGroupBuyActivityId())
-                                            // .eq(GroupBuyRecord::getGroupLeaderUid, userId)  // 关键：只统计该用户作为团长的记录
-                                            //.eq(GroupBuyRecord::getRecordStatus, GroupBuyRecordEnum.GROUP_BUY_RECORD_ENUM_STATUS_INIT.getCode()) // 只统计进行中的
-                                            .between(GroupBuyRecord::getCreateTime, startOfDay, endOfDay)
+                                            .eq(GroupBuyRecord::getIsDel, 0)
+                                            .ge(GroupBuyRecord::getCreateTime, groupBuyActivity.getStartTime())
                             );
 
-                            // 如果设置了最大开团限制，且超过限制则拦截
+                            // 预下单阶段的提前提示；最终并发校验在创建团记录时处理。
                             if (groupBuyActivity.getMaxGroupLimit() != null && groupBuyActivity.getMaxGroupLimit() > 0) {
-                                if (todayUserGroups >= groupBuyActivity.getMaxGroupLimit()) {
-                                    throw new CrmebException("今日开团次数已达上限（" + groupBuyActivity.getMaxGroupLimit() + "个），可加入他人拼团！");
+                                if (openedCount >= groupBuyActivity.getMaxGroupLimit()) {
+                                    throw new CrmebException("本活动开团名额已满，可加入其他拼团");
                                 }
                             }
                         } finally {
