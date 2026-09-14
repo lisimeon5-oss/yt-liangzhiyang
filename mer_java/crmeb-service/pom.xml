@@ -18,11 +18,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.zbkj</groupId>
             <artifactId>crmeb-common</artifactId>
             <version>${crmeb-common}</version>
