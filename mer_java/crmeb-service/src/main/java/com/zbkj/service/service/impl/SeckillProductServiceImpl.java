@@ -37,8 +37,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -266,6 +268,9 @@ public class SeckillProductServiceImpl extends ServiceImpl<SeckillProductDao, Se
      */
     @Override
     public List<SeckillProduct> getIndexList(List<Integer> aidList) {
+        if (CollUtil.isEmpty(aidList)) {
+            return CollUtil.newArrayList();
+        }
         LambdaQueryWrapper<SeckillProduct> lqw = Wrappers.lambdaQuery();
         lqw.select(SeckillProduct::getId,SeckillProduct::getProductId , SeckillProduct::getName, SeckillProduct::getSeckillPrice, SeckillProduct::getImage, SeckillProduct::getPrice);
         lqw.in(SeckillProduct::getActivityId, aidList);
@@ -273,8 +278,14 @@ public class SeckillProductServiceImpl extends ServiceImpl<SeckillProductDao, Se
         lqw.eq(SeckillProduct::getIsDel, 0);
         lqw.eq(SeckillProduct::getAuditStatus, 2);
         lqw.orderByDesc(SeckillProduct::getSort);
-        lqw.last(" limit 8");
-        return dao.selectList(lqw);
+        // 同排序时优先展示低价商品，并用唯一ID保证顺序稳定。
+        lqw.orderByAsc(SeckillProduct::getSeckillPrice);
+        lqw.orderByDesc(SeckillProduct::getId);
+        // 首页展示所有进行中活动的商品；同一商品参与多个活动时只展示优先记录。
+        Set<Integer> productIds = new HashSet<>();
+        return dao.selectList(lqw).stream()
+                .filter(product -> productIds.add(product.getProductId()))
+                .collect(Collectors.toList());
     }
 
     /**
