@@ -299,7 +299,10 @@ public class SeckillProductServiceImpl extends ServiceImpl<SeckillProductDao, Se
         if (merId > 0) {
             lqw.eq(SeckillProduct::getMerId, merId);
         }
-        lqw.last(" order by sort desc, (quota_show - quota) desc");
+        // 实时销量会使商品跨页移动；使用稳定顺序，避免重复或漏商品。
+        lqw.orderByDesc(SeckillProduct::getSort);
+        lqw.orderByAsc(SeckillProduct::getSeckillPrice);
+        lqw.orderByDesc(SeckillProduct::getId);
         List<SeckillProduct> productList = dao.selectList(lqw);
         return CommonPage.copyPageInfo(page, productList);
     }
