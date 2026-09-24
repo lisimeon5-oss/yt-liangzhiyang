@@ -32,7 +32,7 @@
 							<view class='phone'>{{addressInfo.phone}}</view>
 						</view>
 						<view class="acea-row">
-							<view class="line1"><text class='default  font_color' v-if="addressInfo.isDefault">[{{$t('默认')}}]</text>{{addressInfo.province}}{{addressInfo.city}}{{addressInfo.district}}{{ addressInfo.street}}{{addressInfo.detail}}</view>
+							<view class="line1"><text class='default  font_color' v-if="addressInfo.isDefault">[{{$t('默认')}}]</text>{{ displayAddress(addressInfo) }}</view>
 						</view>
 					</view>
 					<view class='addressCon' v-else>
@@ -66,7 +66,7 @@
 						</view>
 						<view class="acea-row line2">
 							<text class='default font_color' v-if="addressInfo.isDefault">[{{$t('默认')}}]</text>
-							<text>{{addressInfo.province}}{{addressInfo.city}}{{addressInfo.district}}{{ addressInfo.street}}{{addressInfo.detail}}</text>
+							<text>{{ displayAddress(addressInfo) }}</text>
 						</view>
 					</view>
 					<view class='addressCon' v-else>
@@ -235,6 +235,7 @@
 	</view>
 </template>
 <script>
+	import regionNames from '@/mixins/regionNames.js';
 	// +----------------------------------------------------------------------
 	// | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 	// +----------------------------------------------------------------------
@@ -302,7 +303,7 @@
 		},
 	}
 	export default {
-		mixins: [orderPay],
+		mixins: [orderPay, regionNames],
 		components: {
 			navBar,
 			couponListWindow,

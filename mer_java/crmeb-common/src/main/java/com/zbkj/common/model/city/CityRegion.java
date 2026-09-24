@@ -36,6 +36,10 @@ public class CityRegion implements Serializable {
     @ApiModelProperty(value = "区域名称")
     private String regionName;
 
+    @ApiModelProperty(value = "地区译名JSON，键为语言代码；缺省回退到regionName")
+    private String regionNames;
+
+
     @ApiModelProperty(value = "区域类型，0-国家、1-省、2-市、3-区、4-街道")
     private Integer regionType;
 

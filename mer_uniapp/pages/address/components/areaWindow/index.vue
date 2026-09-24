@@ -5,7 +5,7 @@
 			<view class="address-count">
 				<view class="address-selected">
 					<view v-for="(item,index) in selectedArr" :key="index" class="selected-list" :class="{active:index === selectedIndex}" @click="change(item, index)">
-						{{item.regionName?item.regionName:$t('请选择')}}
+						{{item.regionName ? displayRegion(item) : $t('请选择')}}
 						<text class="iconfont icon-xiangyou"></text>
 					</view>
 					<view class="selected-list" :class="{active:-1 === selectedIndex}"  v-if="showMore" @click="change(-1, -1)">
@@ -15,7 +15,7 @@
 				</view>
 				<scroll-view scroll-y="true" :scroll-top="scrollTop" class="address-list" @scroll="scroll">
 					<view v-for="(item,index) in addressList" :key="index" class="list" :class="{active:item.regionId === activeId}" @click="selected(item, index)">
-						<text class="item-name">{{item.regionName}}</text>
+						<text class="item-name">{{ displayRegion(item) }}</text>
 						<text v-if="item.regionId === activeId" class="iconfont icon-duihao2"></text>
 					</view>
 				</scroll-view>
@@ -36,9 +36,11 @@
 	// | Author: CRMEB Team <admin@crmeb.com>
 	// +----------------------------------------------------------------------
 	import { getCity } from '@/api/api.js';
-	const CACHE_ADDRESS = {};
+	import regionNames from '@/mixins/regionNames.js';
+
 	let app = getApp();
 	export default {
+		mixins: [regionNames],
 		props: {
 			display: {
 				type: Boolean,
@@ -86,6 +88,7 @@
 					this.selectedIndex = -1;
 					this.is_loading = false;
 				}else{
+					this.refreshRegionNames();
 					this.loadAddress(1, 1)
 				}
 			}
@@ -95,10 +98,6 @@
 		},
 		methods: {
 			loadAddress(parentId, regionType){
-				if(CACHE_ADDRESS[parentId]){
-					this.addressList = CACHE_ADDRESS[parentId];
-					return ;
-				}
 				let data = {
 					parentId: parentId,
 					regionType: regionType
@@ -106,7 +105,6 @@
 				this.is_loading = true;
 				getCity(data).then(res=>{
 					this.is_loading = false;
-					CACHE_ADDRESS[parentId] = res.data;
 					this.addressList = res.data;
 				})
 				this.goTop()

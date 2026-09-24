@@ -43,4 +43,8 @@ public class CityRegionEditRequest implements Serializable {
     @NotEmpty(message = "区域名称不能为空")
     private String regionName;
 
+    @ApiModelProperty(value = "地区译名JSON，键为语言代码；缺省回退到regionName")
+    private String regionNames;
+
+
 }

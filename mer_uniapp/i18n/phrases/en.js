@@ -1,4 +1,13 @@
 export default {
+  "可以不填": "Optional",
+  "必填": "Required",
+  "联系飞机": "Telegram",
+  "请填写联系飞机": "Enter your Telegram username",
+  "编辑地址": "Edit address",
+  "收货人：": "Recipient: ",
+  "收货地址：": "Delivery address: ",
+  "授权位置信息，提供完整服务": "Allow location access for full service",
+
   "，拼团失败": ", group failed",
   "，确认开通该套餐。": ". Confirm this plan.",
   "( 最多可上传4张 )": "(Up to 4 images)",

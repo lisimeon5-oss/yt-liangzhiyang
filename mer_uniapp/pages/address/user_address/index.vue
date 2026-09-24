@@ -4,25 +4,25 @@
 			<view class='addAddress borderPad'>
 				<view class='list borRadius14'>
 					<view class='item acea-row' style="border: none;">
-						<view class='name'>姓名</view>
-						<input type='text' placeholder='请输入姓名' placeholder-style="color:#ccc;" name='realName'
+						<view class='name'>{{ $t('姓名') }}</view>
+						<input type='text' :placeholder="$t('请输入姓名')" placeholder-style="color:#ccc;" name='realName'
 							:value="userAddress.realName" placeholder-class='placeholder' maxlength="20"></input>
 					</view>
 					<view class='item acea-row'>
-						<view class='name'>手机号码</view>
-						<input type='number' placeholder='可以不填' placeholder-style="color:#ccc;" name="phone"
+						<view class='name'>{{ $t('手机号码') }}</view>
+						<input type='number' :placeholder="$t('可以不填')" placeholder-style="color:#ccc;" name="phone"
 							:value='userAddress.phone' placeholder-class='placeholder' maxlength="11"></input>
 					</view>
 					<view class='item acea-row'>
-						<view class='name'>联系飞机</view>
-						<input type='text' placeholder='必填' placeholder-style="color:#ccc;" name="tgUsername"
+						<view class='name'>{{ $t('联系飞机') }}</view>
+						<input type='text' :placeholder="$t('必填')" placeholder-style="color:#ccc;" name="tgUsername"
 							:value='userAddress.tgUsername' placeholder-class='placeholder' maxlength="100"></input>
 					</view>
 					<view class='item acea-row row-between-wrapper'>
-						<view class='name'>收货地址</view>
+						<view class='name'>{{ $t('收货地址') }}</view>
 						<view class="address">
 							<view class="region_count" @click="changeRegion">
-								<text v-if="!addressInfo.length" style="color:#cdcdcd;">请选择地址</text>
+								<text v-if="!addressInfo.length" style="color:#cdcdcd;">{{ $t('请选择地址') }}</text>
 								<text v-else>{{addressText}}</text>
 								
 							</view>
@@ -31,24 +31,24 @@
 						<text class="iconfont icon-xiangyou"></text>
 					</view>
 					<view class='item acea-row row-between-wrapper'>
-						<view class='name'>详细地址</view>
-						<input class="address" type='text' placeholder='请填写具体地址' placeholder-style="color:#ccc;" name='detail'
+						<view class='name'>{{ $t('详细地址') }}</view>
+						<input class="address" type='text' :placeholder="$t('请填写具体地址')" placeholder-style="color:#ccc;" name='detail'
 							placeholder-class='placeholder' v-model='userAddress.detail' maxlength="100"></input>
 						<view class='iconfont icon-dizhi font_color' @tap="chooseLocation"></view>
 					</view>
 				</view>
 				<view class='default acea-row row-middle borRadius14'>
 					<checkbox-group @change='ChangeIsDefault'>
-						<checkbox :checked="userAddress.isDefault" />设置为默认地址
+						<checkbox :checked="userAddress.isDefault" />{{ $t('设置为默认地址') }}
 					</checkbox-group>
 				</view>
 
-				<button class='keepBnt bg_color' form-type="submit">{{orderNo!=0?'保存并使用':'立即保存'}}</button>
+				<button class='keepBnt bg_color' form-type="submit">{{ orderNo != 0 ? $t('保存并使用') : $t('立即保存') }}</button>
 				<!-- #ifdef MP -->
-				<view class="wechatAddress" v-if="!addressId" @click="getWxAddress">导入微信地址</view>
+				<view class="wechatAddress" v-if="!addressId" @click="getWxAddress">{{ $t('导入微信地址') }}</view>
 				<!-- #endif -->
 				<!-- #ifdef H5 -->
-				<view class="wechatAddress" v-if="this.$wechat.isWeixin() && !addressId" @click="getAddress">导入微信地址</view>
+				<view class="wechatAddress" v-if="this.$wechat.isWeixin() && !addressId" @click="getAddress">{{ $t('导入微信地址') }}</view>
 				<!-- #endif -->
 			</view>
 		</form>
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+	import regionNames from '@/mixins/regionNames.js';
 	import {
 		editAddress,
 		addAddress,
@@ -85,6 +86,7 @@
 	} from '@/api/public.js';
 	let app = getApp();
 	export default {
+		mixins: [regionNames],
 		components: {
 			areaWindow
 		},
@@ -117,7 +119,7 @@
 		computed: {
 			...mapGetters(['isLogin']),
 			addressText() {
-				return this.addressInfo.map(v => v.regionName).join('/');
+				return this.addressInfo.map(v => this.displayRegion(v)).join('/');
 			}
 		},
 		watch: {
@@ -135,7 +137,7 @@
 				this.orderNo = options.orderNo || 0;
 				this.addressId = options.id || 0;
 				uni.setNavigationBarTitle({
-					title: this.addressId ? '编辑地址' : '添加地址'
+					title: this.addressId ? this.$t('编辑地址') : this.$t('添加地址')
 				})
 				this.getUserAddress();
 			} else {
@@ -264,22 +266,22 @@
 				let that = this,
 					value = e.detail.value;
 				if (!value.realName) return that.$util.Tips({
-					title: '请填写收货人姓名'
+					title: that.$t('请填写收货人姓名')
 				});
 /* 				if (!value.phone) return that.$util.Tips({
-					title: '请填写手机号码'
+					title: that.$t('请填写手机号码')
 				}); 
 				if (!/^1(3|4|5|7|8|9|6)\d{9}$/i.test(value.phone)) return that.$util.Tips({
-					title: '请输入正确的手机号码'
+					title: that.$t('请输入正确的手机号码')
 				});*/
 				if (!value.tgUsername) return that.$util.Tips({
-					title: '请填写联系飞机'
+					title: that.$t('请填写联系飞机')
 				});
 				if (!that.addressInfo.length == '省-市-区-街道') return that.$util.Tips({
-					title: '请选择所在地区'
+					title: that.$t('请选择所在地区')
 				});
 				if (!value.detail) return that.$util.Tips({
-					title: '请填写详细地址'
+					title: that.$t('请填写详细地址')
 				});
 				value.id = that.addressId;
 				value.province = that.addressInfo[0].regionName;
@@ -301,13 +303,13 @@
 				value.isDefault = that.userAddress.isDefault;*/
 
 				uni.showLoading({
-					title: '保存中',
+					title: that.$t('保存中'),
 					mask: true
 				})
 				if (that.addressId) {
 					editAddress(value).then(res => {
 						that.$util.Tips({
-							title: '修改成功',
+							title: that.$t('修改成功'),
 							icon: 'success'
 						});
             uni.hideLoading();
@@ -321,7 +323,7 @@
 				} else {
 					addAddress(value).then(res => {
 						that.$util.Tips({
-							title: '添加成功',
+							title: that.$t('添加成功'),
 							icon: 'success'
 						});
 						that.addressId = res.data;
@@ -395,12 +397,15 @@
 	.addAddress .list .item .name {
 		font-size: 30rpx;
 		color: #333;
-		width: 120rpx;
+		width: 180rpx;
+		flex-shrink: 0;
+		word-break: break-word;
 	}
 
 	.addAddress .list .item input, .address {
 			flex: 1;
-		width: 490rpx;
+		min-width: 0;
+		width: 0;
 		margin-left: 20rpx;
 		font-size: 30rpx;
 		font-weight: 400;
@@ -417,7 +422,10 @@
 
 	.addAddress .default {
 		padding: 0 30rpx;
-		height: 90rpx;
+		min-height: 90rpx;
+		height: auto;
+		padding-top: 20rpx;
+		padding-bottom: 20rpx;
 		background-color: #fff;
 		margin-top: 23rpx;
 	}

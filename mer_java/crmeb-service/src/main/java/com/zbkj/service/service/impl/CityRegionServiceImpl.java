@@ -18,6 +18,7 @@ import com.zbkj.common.response.CityResponse;
 import com.zbkj.common.result.CommonResultCode;
 import com.zbkj.common.result.SystemConfigResultCode;
 import com.zbkj.common.utils.RedisUtil;
+import com.zbkj.common.utils.RegionNamesUtil;
 import com.zbkj.common.vo.CityTree;
 import com.zbkj.common.vo.CityVo;
 import com.zbkj.service.dao.CityRegionDao;
@@ -68,7 +69,7 @@ public class CityRegionServiceImpl extends ServiceImpl<CityRegionDao, CityRegion
             List<CityVo> treeList = new ArrayList<>();
 
             LambdaQueryWrapper<CityRegion> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.select(CityRegion::getRegionId, CityRegion::getParentId, CityRegion::getRegionName, CityRegion::getRegionType);
+            lambdaQueryWrapper.select(CityRegion::getRegionId, CityRegion::getParentId, CityRegion::getRegionName, CityRegion::getRegionNames, CityRegion::getRegionType);
             lambdaQueryWrapper.lt(CityRegion::getRegionType, RegionTypeEnum.STREET.getValue());
             List<CityRegion> allTree = dao.selectList(lambdaQueryWrapper);
             if (CollUtil.isEmpty(allTree)) {
@@ -100,7 +101,7 @@ public class CityRegionServiceImpl extends ServiceImpl<CityRegionDao, CityRegion
             List<CityVo> treeList = new ArrayList<>();
 
             LambdaQueryWrapper<CityRegion> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.select(CityRegion::getRegionId, CityRegion::getParentId, CityRegion::getRegionName, CityRegion::getRegionType);
+            lambdaQueryWrapper.select(CityRegion::getRegionId, CityRegion::getParentId, CityRegion::getRegionName, CityRegion::getRegionNames, CityRegion::getRegionType);
             List<CityRegion> allTree = dao.selectList(lambdaQueryWrapper);
             if (CollUtil.isEmpty(allTree)) {
                 return treeList;
@@ -133,7 +134,13 @@ public class CityRegionServiceImpl extends ServiceImpl<CityRegionDao, CityRegion
         }
         CityRegion cityRegion = new CityRegion();
         BeanUtils.copyProperties(request, cityRegion);
-        return save(cityRegion);
+        cityRegion.setRegionNames(RegionNamesUtil.merge(null, request.getRegionNames()));
+        boolean saved = save(cityRegion);
+        if (saved) {
+            redisUtil.delete(RedisConstants.CITY_LIST_TREE);
+            redisUtil.delete(RedisConstants.CITY_REGION_LIST_TREE);
+        }
+        return saved;
     }
 
     /**
@@ -151,6 +158,11 @@ public class CityRegionServiceImpl extends ServiceImpl<CityRegionDao, CityRegion
         LambdaUpdateWrapper<CityRegion> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(CityRegion::getRegionId, request.getRegionId());
         wrapper.set(CityRegion::getRegionName, request.getRegionName());
+        // Merge only supplied language keys; disabled languages remain available on re-enable.
+        if (request.getRegionNames() != null) {
+            wrapper.set(CityRegion::getRegionNames, RegionNamesUtil.merge(region.getRegionNames(), request.getRegionNames()));
+        }
+
         wrapper.eq(CityRegion::getRegionId, request.getOldRegionId());
         boolean update = update(wrapper);
         if (update) {

@@ -22,6 +22,12 @@ const operationRouter = {
   },
   children: [
     {
+      path: 'regions',
+      name: 'DeliveryRegionNames',
+      component: () => import('@/views/systemSetting/regions'),
+      meta: { title: '配送地区译名', icon: 'clipboard' },
+    },
+    {
       path: 'setting',
       name: 'setting',
       component: () => import('@/views/systemSetting/setting'),

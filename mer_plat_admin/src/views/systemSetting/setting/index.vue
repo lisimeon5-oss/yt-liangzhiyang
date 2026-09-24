@@ -1,6 +1,9 @@
 <template>
   <div class="divBox">
     <el-card class="box-card" :bordered="false" shadow="never" :body-style="{ padding: '0 20px 20px' }">
+      <div v-if="checkPermi(['platform:city:region:list:tree'])" style="padding: 16px 0">
+        <el-button @click="$router.push('/operation/regions')">配送地区译名</el-button>
+      </div>
       <el-tabs
         class="list-tabs"
         v-model="activeNamel1"

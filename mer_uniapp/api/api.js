@@ -331,3 +331,7 @@ export function systemFromDetail(id){
 export function getOpenAdvApi(){
   return request.get(`index/splash/ad/info`,{},{noAuth:true});
 }
+// Canonical region names plus optional display translations.
+export function getRegionTree() {
+  return request.get('city/list/tree', {}, { noAuth: true });
+}
