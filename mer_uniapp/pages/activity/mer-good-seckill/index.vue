@@ -14,6 +14,7 @@
 </template>
 
 <script>
+	import { mergeSeckillProducts } from '@/utils/seckillList.js';
 	import navBar from '@/components/navBar';
 	import useActivity from "@/mixins/useActivity";
 	import SeckillList from "../components/SeckillList";
@@ -92,7 +93,7 @@
 				this.loading = true
 				seckillMerchantApi(data).then(res => {
 					this.$set(this, 'page', this.page + 1);
-					this.seckillList = this.seckillList.concat(res.data.list || []);
+					this.seckillList = mergeSeckillProducts(this.seckillList, res.data.list || []);
 					this.loadend = this.page > res.data.totalPage;
 					this.loadTitle = this.loadend ? '已全部加载' : '加载更多';
 					this.loading = false;

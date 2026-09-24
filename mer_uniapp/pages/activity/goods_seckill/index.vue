@@ -29,6 +29,7 @@
 </template>
 
 <script>
+	import { mergeSeckillProducts } from '@/utils/seckillList.js';
 	import {
 		getSeckillHeaderApi,
 		getSeckillListApi,
@@ -79,6 +80,7 @@
 				timeList: [],
 				active: 0,
 				page: 1,
+				requestId: 0,
 				limit: 5,
 				loading: true,
 				loadend: false,
@@ -202,6 +204,7 @@
 				});
 			},
 			async getSeckillList(item) {
+				let requestId;
 				try {
 					const data = {
 						page: this.page,
@@ -212,16 +215,18 @@
 					};
 					if (this.loadend) return;
 					if (this.loading) return;
+					requestId = ++this.requestId;
 					this.loadTitle = '';
 					this.loading = true
 					const res = await getSeckillListApi(data);
-					this.loadend = this.page > res.data.totalPage;
-					if (this.page == 1) {
+					if (requestId !== this.requestId) return;
+					this.loadend = data.page >= res.data.totalPage || !(res.data.list || []).length;
+					if (data.page == 1) {
 						this.seckillList = [];
 					}
 					this.loadTitle = this.loadend ? '已全部加载' : '加载更多';
-					this.seckillList = this.seckillList.concat(res.data.list || []);
-					this.$set(this, 'page', this.page + 1);
+					this.seckillList = mergeSeckillProducts(this.seckillList, res.data.list || []);
+					this.$set(this, 'page', data.page + 1);
 					this.$nextTick(() => {
 						this.$set(this, 'seckillList', this.seckillList);
 					});
@@ -231,6 +236,7 @@
 					// #endif
 					this.showSkeleton = false
 				} catch (error) {
+					if (requestId !== this.requestId) return;
 					this.loading = false
 				}
 			},
