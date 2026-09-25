@@ -1,0 +1,16 @@
+# Translation / data export dumps (not application source)
+/exports/
+
+# One-off admin build output folders (dist-bargain-records, dist-navigation-fix, ...)
+dist-*/
+
+# Packaged archives (keep SQL preset pack in repo)
+*.zip
+!mer_java/sql/presets.zip
+
+# Runtime / build logs
+*.log
+
+# Python cache from local i18n helper scripts
+__pycache__/
+*.pyc
