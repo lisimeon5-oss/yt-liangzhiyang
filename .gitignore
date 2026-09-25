@@ -14,3 +14,8 @@ dist-*/
 # Python cache from local i18n helper scripts
 __pycache__/
 *.pyc
+
+# Local Node verification scripts (AI/dev fixtures, not production)
+mer_mer_admin/tests/
+mer_plat_admin/tests/
+mer_uniapp/tests/
