@@ -162,7 +162,6 @@
 							</view>
 						</view>
 					</view>
-					<image :src="copyImage" alt="" class='support'></image>
 				</scroll-view>
 			</view>
 		</view>
@@ -196,8 +195,7 @@
 		USER_INFO
 	} from '@/config/cache';
 	import {
-		userCenterInfo,
-		copyrightImageApi
+		userCenterInfo
 	} from '@/api/user.js';
 	import {
 		MerchantBelongListApi,
@@ -309,7 +307,6 @@
 				theme: app.globalData.theme,
 				bgColor: '#e93323',
 				userInfo: {},
-				copyImage: '',
 				navH:''
 			}
 		},
@@ -363,7 +360,6 @@
 				this.getOrderData();
 				this.getMerchantList()
 			}
-			this.copyrightImage();
 			this.showSkeleton = false
 			let that = this;
 			if (!that.$Cache.get('cityList')) getCityList();
@@ -453,19 +449,6 @@
 						this.$store.commit('UPDATE_USERINFO', {});
 					}
 				})
-			},
-			copyrightImage() {
-				copyrightImageApi().then(res => {
-					if (res.data) {
-						this.copyImage = res.data;
-					} else {
-						this.copyImage = `${this.urlDomain}crmebimage/presets/support.png`;
-					}
-				}).catch(err => {
-					return this.$util.Tips({
-						title: err
-					})
-				});
 			},
 			bindEdit(name) {
 				if (this.globalData.isIframe) {
@@ -662,12 +645,7 @@
 		background-size: 100% 100%;
 	}
 
-	.support {
-		width: 219rpx;
-		height: 74rpx;
-		margin: 20rpx auto;
-		display: block;
-	}
+
 
 	.new-users {
 		display: flex;
@@ -895,6 +873,7 @@
 		.user-menus {
 			background-color: #fff;
 			border-radius: 14rpx;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Myanmar", "Myanmar Text", "Microsoft YaHei", sans-serif;
 
 			.menu-title {
 				padding: 30rpx 30rpx 40rpx;
@@ -906,24 +885,40 @@
 			.list-box {
 				display: flex;
 				flex-wrap: wrap;
-				padding: 0;
+				align-items: stretch;
+				padding: 0 12rpx 12rpx;
 			}
 
 			.item {
 				position: relative;
 				display: flex;
 				align-items: center;
-				justify-content: space-between;
+				justify-content: flex-start;
 				flex-direction: column;
 				width: 25%;
-				margin-bottom: 47rpx;
-				font-size: 26rpx;
+				min-width: 0;
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0 8rpx 32rpx;
+				font-size: 24rpx;
+				line-height: 40rpx;
+				text-align: center;
 				color: #333333;
 
 				image {
 					width: 52rpx;
 					height: 52rpx;
 					margin-bottom: 18rpx;
+					flex-shrink: 0;
+				}
+
+				text {
+					display: block;
+					width: 100%;
+					min-height: 80rpx;
+					white-space: normal;
+					overflow-wrap: anywhere;
+					word-break: normal;
 				}
 
 
@@ -933,7 +928,10 @@
 			}
 
 			button {
-				font-size: 28rpx;
+				font: inherit;
+				background: transparent;
+				border-radius: 0;
+				&::after { border: 0; }
 			}
 		}
 

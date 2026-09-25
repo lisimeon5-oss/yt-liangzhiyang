@@ -49,12 +49,12 @@ export default {
     }),
     isIconI18n() {
       const name = this.defaults && this.defaults.name;
-      return name === 'homeMerchant' || name === 'news' || name === 'seckill' || name === 'group' || name === 'intergral' || name === 'homeDiscover';
+      return name === 'homeMerchant' || name === 'news' || name === 'bargain' || name === 'seckill' || name === 'group' || name === 'intergral' || name === 'homeDiscover';
     },
     useParentLang() {
       return (
         this.defaults &&
-        (this.defaults.name === 'seckill' ||
+        (this.defaults.name === 'bargain' || this.defaults.name === 'seckill' ||
           this.defaults.name === 'group' ||
           this.defaults.name === 'intergral' ||
           this.defaults.name === 'homeDiscover') &&

@@ -1,4 +1,6 @@
 export const PAGE_TITLES = {
+  'pages/activity/bargain/index': 'bargain.title',
+  'pages/activity/bargain/detail': 'bargain.title',
   'pages/activity/couponList/index': '领券中心',
   'pages/activity/goods_group/index': '拼团活动',
   'pages/activity/goods_points/index': '热门推荐',

@@ -180,14 +180,12 @@ export default {
   },
   watch: {
     // 监听 vuex 数据变化
-    '$store.state': {
+    '$store.state.themeConfig.themeConfig.columnsAsideStyle': {
       handler(val) {
-        val.themeConfig.themeConfig.columnsAsideStyle === 'columnsRound'
+        val === 'columnsRound'
           ? (this.difference = 3)
           : (this.difference = 0);
-        if (val.user.menuListlength === this.columnsAsideList.length) return false;
       },
-      deep: true,
     },
     // 监听路由的变化
     $route: {

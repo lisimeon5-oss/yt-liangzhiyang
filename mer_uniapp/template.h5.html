@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
     <head>
+        <script>
+            // Capture only the destination before the SDK/router rewrites the launch URL.
+            (function () {
+                function read(value) {
+                    var text = (value || '').replace(/^[?#]/, '');
+                    if (text.charAt(0) === '/') text = text.slice(text.indexOf('?') + 1);
+                    var params = new URLSearchParams(text);
+                    return params.get('tgWebAppStartParam') || new URLSearchParams(params.get('tgWebAppData') || '').get('start_param') || '';
+                }
+                var payload = read(window.location.search) || read(window.location.hash);
+                if (/^(bargain_[1-9]\d*|group_[1-9]\d{0,9}_[1-9]\d{0,9}_[1-9]\d{0,9})$/.test(payload)) window.__mallTelegramStart = payload;
+            })();
+        </script>
         <!-- ⭐ 换用官方 Telegram CDN -->
         <script src="https://telegram.org/js/telegram-web-app.js">
         </script>

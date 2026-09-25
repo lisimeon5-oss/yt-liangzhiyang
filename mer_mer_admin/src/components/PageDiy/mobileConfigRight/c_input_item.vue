@@ -92,7 +92,7 @@ export default {
       const name = this.defaults && this.defaults.name;
       return (
         this.configNme === 'placeWords' ||
-        (this.configNme === 'titleConfig' && (name === 'homeMerchant' || name === 'seckill' || name === 'group')) ||
+        (this.configNme === 'titleConfig' && (name === 'homeMerchant' || name === 'bargain' || name === 'seckill' || name === 'group')) ||
         (name === 'titles' &&
           (this.configNme === 'titleConfig' || this.configNme === 'titleFuConfig' || this.configNme === 'titleRightConfig'))
       );
@@ -100,7 +100,7 @@ export default {
     useParentLang() {
       return (
         this.defaults &&
-        (this.defaults.name === 'seckill' || this.defaults.name === 'group') &&
+        (this.defaults.name === 'bargain' || this.defaults.name === 'seckill' || this.defaults.name === 'group') &&
         this.configObj &&
         this.configObj.diyMediaLang
       );

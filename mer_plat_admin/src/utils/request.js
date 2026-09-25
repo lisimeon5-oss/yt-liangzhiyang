@@ -19,6 +19,7 @@ import { backendMessageMap } from '@/i18n/backendMessageMap';
 
 function translateApiMessage(message) {
   if (!message) return i18n.t('common.requestFailed');
+  if (message.startsWith('bargain.') && i18n.te(message)) return i18n.t(message);
   const key = backendMessageMap[message];
   return key ? i18n.t(key) : message;
 }

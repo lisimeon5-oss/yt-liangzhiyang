@@ -98,6 +98,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     @Autowired
     private ProductService productService;
     @Autowired
+    private com.zbkj.service.service.BargainService bargainService;
+    @Autowired
     private ProductAttrValueService productAttrValueService;
     @Autowired
     private OrderProfitSharingService orderProfitSharingService;
@@ -779,6 +781,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
      * @return 回滚结果
      */
     private Boolean rollbackStock(Order order) {
+        // Only the transaction releasing the bargain reservation may restore base stock.
+        if (order.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN) && !bargainService.cancel(order.getOrderNo())) return true;
         // 查找出商品详情
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
         if (CollUtil.isEmpty(orderDetailList)) {

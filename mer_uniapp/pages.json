@@ -1007,7 +1007,9 @@
 		{
 			"root": "pages/activity",
 			"name": "activity",
-			"pages": [{
+			"pages": [
+                {"path":"bargain/index","style":{"navigationBarTitleText":"砍价活动"}},
+                {"path":"bargain/detail","style":{"navigationBarTitleText":"砍价活动"}},{
 					"path": "goods_seckill/index",
 					"style": {
 						"navigationBarTitleText": "秒杀列表",

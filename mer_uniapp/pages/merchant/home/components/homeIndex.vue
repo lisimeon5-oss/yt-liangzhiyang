@@ -35,6 +35,7 @@
 						<!-- 视频 -->
 						<shortVideo v-if="item.name == 'video'" :dataConfig="item"></shortVideo>
 						<!-- 拼团 -->
+						<home-bargain v-if="item.name === 'bargain'" :dataConfig="item" :merId="merId"></home-bargain>
 						<group v-if="item.name == 'group'" :dataConfig="item" :merId="merId"></group>
 						<!-- 辅助线 -->
 						<guide v-if="item.name == 'guide'" :dataConfig="item"></guide>
@@ -90,6 +91,7 @@
 	import blankPage from '@/components/homeIndex/blankPage';
 	import homeTitle from '@/components/homeIndex/title';
 	import hotSpot from '@/components/homeIndex/hotSpot.vue';
+	import homeBargain from "@/components/homeIndex/bargain.vue";
 	import group from "@/components/homeIndex/group.vue";
 	import pageFooter from "@/components/pageFooter/index.vue";
   import merHome from '@/components/merHome/index.vue'
@@ -125,6 +127,7 @@
 			blankPage,
 			homeTitle,
 			hotSpot,
+			homeBargain,
 			group,
       merHome
 		},

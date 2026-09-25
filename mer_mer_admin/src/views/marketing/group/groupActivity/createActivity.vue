@@ -104,6 +104,10 @@
                 ></el-input-number>
                 <div class="from-tips">{{ $t('marketing.singleLimitTip') }}</div>
               </el-form-item>
+              <el-form-item :label="$t('marketing.maxGroupLimitLabel')" label-width="130px" prop="maxGroupLimit">
+                <el-input-number v-model="formData.maxGroupLimit" :min="0" :max="2147483647" :precision="0" :controls="false" class="from-ipt-width"></el-input-number>
+                <div class="from-tips">{{ $t('marketing.maxGroupLimitTip') }}</div>
+              </el-form-item>
               <div class="title">{{ $t('marketing.advancedSettings') }}</div>
               <el-form-item :label="$t('marketing.joinGroupLabel')" label-width="100px">
                 <el-switch
@@ -311,6 +315,7 @@ export default {
         validHour: '',
         allQuota: '',
         oncQuota: '',
+        maxGroupLimit: 0,
         showGroup: 0,
         fictiStatus: 0,
         startTime: '',
@@ -353,6 +358,7 @@ export default {
         validHour: [{ required: true, message: this.$t('marketing.pleaseEnterValidTime'), trigger: 'blur' }],
         allQuota: [{ required: true, message: this.$t('marketing.pleaseEnterActivityLimit'), trigger: 'blur' }],
         oncQuota: [{ required: true, message: this.$t('marketing.pleaseEnterSingleLimit'), trigger: 'blur' }],
+        maxGroupLimit: [{ type: 'integer', required: true, min: 0, max: 2147483647, message: this.$t('marketing.maxGroupLimitInvalid'), trigger: 'blur' }],
         startTime: [{ required: true, message: this.$t('marketing.pleaseSelectActivityTime'), trigger: 'change' }],
       };
     },
@@ -425,7 +431,7 @@ export default {
     //编辑复制-数据回显
     getInfo(id) {
       groupBuyInfo(id).then((res) => {
-        this.formData = res;
+        this.formData = { ...res, maxGroupLimit: res.maxGroupLimit == null ? 0 : res.maxGroupLimit };
         this.nameJsonForm = this.parseNameJson(res.groupNameJson);
         this.activeLang = resolveFormActiveLang(this);
         this.time = [res.startTime, res.endTime];

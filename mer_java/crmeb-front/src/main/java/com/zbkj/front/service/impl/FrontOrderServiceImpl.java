@@ -141,6 +141,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private SystemGroupDataService systemGroupDataService;
     @Autowired
     private SeckillService seckillService;
+
+    @Autowired
+    private com.zbkj.service.service.BargainService bargainService;
     @Autowired
     private SeckillProductService seckillProductService;
     @Autowired
@@ -256,7 +259,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         if (preOrderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)
                 || preOrderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)
-                || preOrderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_PITUAN)) {
+                || preOrderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_PITUAN)
+                || preOrderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) {
             // 活动商品不使用优惠券
             return createPreOrderResponse(user.getId(), preOrderInfoVo);
         }
@@ -904,7 +908,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         List<PreOrderMerchantInfoResponse> infoResponseList = new ArrayList<>();
         List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
-        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)
+        if ((orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)
                 || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_INTEGRAL)) {
             for (PreMerchantOrderVo merchantOrderVo : merchantOrderVoList) {
                 PreOrderMerchantInfoResponse infoResponse = new PreOrderMerchantInfoResponse();
@@ -1240,6 +1244,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
         }
 
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) {
+            if (Boolean.TRUE.equals(orderRequest.getIsUseIntegral()) || orderRequest.getPlatUserCouponId() > 0
+                    || orderMerchantRequestList.stream().anyMatch(m -> m.getUserCouponId() > 0))
+                throw new CrmebException("bargain.noDiscounts");
+        }
         // 校验商品库存
         List<MyRecord> skuRecordList = validateProductStock(orderInfoVo);
 
@@ -1259,7 +1268,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         orderInfoVo.setPlatCouponFee(BigDecimal.ZERO);
         orderInfoVo.setCouponFee(BigDecimal.ZERO);
         orderInfoVo.setMerCouponFee(BigDecimal.ZERO);
-        getCouponFee_V1_3(orderInfoVo, user.getId(), user.getIsPaidMember());
+        if (!orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN))
+            getCouponFee_V1_3(orderInfoVo, user.getId(), user.getIsPaidMember());
         if (orderRequest.getIsUseIntegral() && user.getIntegral() > 0) {// 使用积分
             integralDeductionComputed(orderInfoVo, user.getIntegral(), user.getIsPaidMember());
         }
@@ -1409,6 +1419,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         order.setCreateTime(DateUtil.date());
         Boolean execute = transactionTemplate.execute(e -> {
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) {
+                bargainService.reserve(orderInfoVo, user.getId(), order.getOrderNo());
+            }
             Boolean result = false;
             if (order.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_CLOUD)) { // 云盘订单
                 MyRecord skuRecord = skuRecordList.get(0);
@@ -2730,6 +2743,29 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_BASE);
                 preOrderInfoVo.setSecondType(OrderConstants.ORDER_SECOND_TYPE_NORMAL);
                 break;
+            case OrderConstants.PLACE_ORDER_TYPE_BARGAIN:
+                if (request.getOrderDetails().size() != 1) throw new CrmebException("bargain.invalidProduct");
+                PreOrderDetailRequest bargainRequest = request.getOrderDetails().get(0);
+                com.zbkj.common.model.bargain.BargainActivity bargain = bargainService.validateOrder(bargainRequest.getBargainRecordId(), user.getId(), bargainRequest);
+                PreMerchantOrderVo bargainMerchant = validatePreOrderBase(bargainRequest);
+                bargainMerchant.setType(OrderConstants.ORDER_TYPE_BARGAIN);
+                PreOrderInfoDetailVo bargainDetail = bargainMerchant.getOrderInfoList().get(0);
+                bargainDetail.setBargainRecordId(bargainRequest.getBargainRecordId());
+                bargainDetail.setPrice(bargain.getMinPrice());
+                bargainDetail.setPayPrice(bargain.getMinPrice());
+                bargainDetail.setIsPaidMember(false);
+                bargainDetail.setVipPrice(BigDecimal.ZERO);
+                bargainDetail.setSubBrokerageType(0);
+                bargainDetail.setBrokerage(0);
+                bargainDetail.setBrokerageTwo(0);
+                preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_BARGAIN);
+                preOrderInfoVo.setSecondType(bargainMerchant.getSecondType());
+                preOrderInfoVo.setSystemFormId(bargainMerchant.getSystemFormId());
+                preOrderInfoVo.setSystemFormValue(bargainMerchant.getSystemFormValue());
+                bargainMerchant.setSystemFormId(0);
+                bargainMerchant.setSystemFormValue("");
+                merchantOrderVoList.add(bargainMerchant);
+                break;
             case OrderConstants.PLACE_ORDER_TYPE_BUY_NOW:
                 // 立即购买只会有一条详情
                 PreOrderDetailRequest preOrderDetailRequest = request.getOrderDetails().get(0);
@@ -3014,7 +3050,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         orderInfoVo.setPlatCouponFee(BigDecimal.ZERO);
         orderInfoVo.setMerCouponFee(BigDecimal.ZERO);
         priceResponse.setCouponFee(BigDecimal.ZERO);
-        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)
+        if ((orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)
                 || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_INTEGRAL)) {
             priceResponse.setMerOrderResponseList(computedPriceGetMerOrderList(orderInfoVo, false));
         } else {
@@ -3030,7 +3066,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         priceResponse.setIsUseIntegral(request.getIsUseIntegral());
         priceResponse.setProTotalFee(orderInfoVo.getProTotalFee());
 
-        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)) {
+        if ((orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)) {
             priceResponse.setDeductionPrice(BigDecimal.ZERO);
             priceResponse.setSurplusIntegral(user.getIntegral());
             priceResponse.setPayFee(payPrice.add(priceResponse.getFreightFee()));
@@ -3096,7 +3132,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     }
 
     private List<CouponUser> computedPriceGetPlatOrderList(PreOrderInfoVo orderInfoVo, Boolean userIsPaidMember) {
-        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)) {
+        if ((orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)) {
             return new ArrayList<>();
         }
         Integer userId = userService.getUserId();
@@ -3278,7 +3314,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             ComputedMerchantOrderResponse merOrderResponse = new ComputedMerchantOrderResponse();
             merOrderResponse.setMerId(vo.getMerId());
             merOrderResponse.setFreightFee(vo.getFreightFee());
-            if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)
+            if ((orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) || orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_BARGAIN)) || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_VIDEO)
                     || orderInfoVo.getSecondType().equals(OrderConstants.ORDER_SECOND_TYPE_INTEGRAL)) {
                 merOrderResponse.setUserCouponId(0);
                 merOrderResponse.setCouponFee(BigDecimal.ZERO);

@@ -49,6 +49,7 @@
 				<!-- 标题 -->
 				<home-title v-if="item.name == 'titles'" :dataConfig="item"></home-title>
 				<!-- 拼团 -->
+				<home-bargain v-if="item.name === 'bargain'" :dataConfig="item" :merId="merId"></home-bargain>
 				<group v-if="item.name == 'group'" :dataConfig="item" :merId="merId"></group>
 				<!-- 积分 -->
 				<intergralShop v-if="item.name == 'intergral'" :dataConfig="item"></intergralShop>
@@ -129,6 +130,7 @@
 	import homeTitle from '@/components/homeIndex/title';
 	import pageFooter from '@/components/pageFooter/index.vue';
 	import recommend from "@/components/base/recommend.vue";
+	import homeBargain from "@/components/homeIndex/bargain.vue";
 	import group from "@/components/homeIndex/group.vue";
 	import intergralShop from "@/components/homeIndex/intergralShop.vue";
 	import hotSpot from '@/components/homeIndex/hotSpot.vue';
@@ -198,6 +200,7 @@
 			homeTitle,
 			pageFooter,
 			recommend,
+			homeBargain,
 			group,
 			intergralShop,
 			hotSpot,

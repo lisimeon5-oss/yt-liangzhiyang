@@ -6,7 +6,7 @@
 				v-if="order_pay_info.paid === 1"></view>
 			<view v-if="order_pay_info.paid === 2" class='iconfont icons icon-iconfontguanbi'></view>
 			<!-- 失败时：订单支付失败 -->
-			<view class='status' v-if="order_pay_info.payType != 'offline'">{{status==2 ? $t('订单取消支付') : errMsg ? $t('订单支付异常'): $t(payResult) }}</view>
+			<view class='status' v-if="order_pay_info.payType != 'offline' && order_pay_info.payType != 'hdfk'">{{status==2 ? $t('订单取消支付') : errMsg ? $t('订单支付异常'): $t(payResult) }}</view>
 			<view class='status' v-else>{{$t('订单创建成功')}}</view>
 			<view class='wrapper'>
 				<view v-show="!fromType" class='item acea-row row-between-wrapper'>
@@ -19,7 +19,7 @@
 				</view>
 				<view v-show="(order_pay_info.payType && order_pay_info.secondType !== ProductTypeEnum.Integral) || (order_pay_info.secondType === ProductTypeEnum.Integral && order_pay_info.payPrice!=0)" class='item acea-row row-between-wrapper'>
 					<view>{{$t('支付方式')}}</view>
-					<view class='itemCom'>{{order_pay_info.payType | payTypeFilter}}{{$t('支付')}}</view>
+					<view class='itemCom'>{{order_pay_info.payType | payTypeFilter}}<text v-if="order_pay_info.payType !== 'hdfk'">{{$t('支付')}}</text></view>
 				</view>
 				<view class='item acea-row row-between-wrapper'>
 					<view>{{$t('支付金额')}}</view>

@@ -140,6 +140,7 @@ export function payTypeFilter(status) {
 		'weixin': '微信',
 		'alipay': '支付宝',
 		'yue': '余额',
+		'hdfk': '货到付款',
         'offline': '线下',
         'give': '平台赠送'
 	}
@@ -163,6 +164,7 @@ export function timeStatusFilter(status) {
  * 订单商品类型
  */
 export function orderTypeFilter(status) {
+	if (Number(status) === 3) return t('bargain.title');
 	const statusMap = {
 		0: '基础',
 		1: '秒杀',

@@ -67,6 +67,13 @@ let cartArr = [{
 		value: 'alipay',
 		title: '支付宝快捷支付',
 		payStatus: 1,
+	},
+	{
+		name: "货到付款",
+		icon: "icon-yuezhifu",
+		value: 'hdfk',
+		title: '收货时付款',
+		payStatus: 1,
 	}
 	// #endif
 ];
@@ -459,8 +466,7 @@ const actions = {
 		state,
 		commit
 	}, force) {
-		return new Promise(reslove => {
-			getPayConfigApi().then(res => {
+		return getPayConfigApi().then(res => {
 				let data = res.data;
 				cartArr[0].payStatus = data.payWechatOpen ? 1 : 0;
 				cartArr[1].payStatus = data.yuePayStatus ? 1 : 0;
@@ -476,15 +482,10 @@ const actions = {
 				cartArr[2].payStatus = data.aliPayStatus ? 1 : 0;
 				// #endif
 				let cartArrs = cartArr.filter(e => e.payStatus === 1);
-				reslove({
+				return {
 					userBalance: data.userBalance,
 					payConfig: cartArrs
-				});
-			})
-		}).catch(err => {
-			return util.Tips({
-				title: err
-			});
+				};
 		});
 	}
 }

@@ -80,6 +80,8 @@ public class PreOrderInfoDetailVo {
     @ApiModelProperty(value = "拼团记录id，营销类型2=拼团 时必填 0=开团 1=拼团")
     private Integer groupBuyRecordId = 0;
 
+    private Integer bargainRecordId;
+
     @ApiModelProperty(value = "运费金额")
     private BigDecimal freightFee = BigDecimal.ZERO;
 

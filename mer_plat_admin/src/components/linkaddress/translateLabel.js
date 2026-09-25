@@ -1,5 +1,6 @@
 export function translateLinkLabel(vm, name) {
   if (!name) return '';
+  if (name === '砍价活动') return vm.$t('bargain.title');
   const key = `linkPicker.names.${name}`;
   const text = vm.$t(key);
   return text === key ? name : text;

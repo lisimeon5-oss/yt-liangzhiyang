@@ -67,6 +67,10 @@
                   <div class="value">{{ groupInfo.allQuota == -1 ? $t('marketing.unlimited') : groupInfo.allQuota }}</div>
                 </li>
                 <li class="item">
+                  <div class="tips">{{ $t('marketing.maxGroupLimitLabel') }}</div>
+                  <div class="value">{{ groupInfo.maxGroupLimit > 0 ? groupInfo.maxGroupLimit : $t('marketing.unlimited') }}</div>
+                </li>
+                <li class="item">
                   <div class="tips">{{ $t('marketing.singlePurchaseLimitLabel') }}</div>
                   <div class="value">{{ groupInfo.oncQuota == -1 ? $t('marketing.unlimited') : groupInfo.oncQuota }}</div>
                 </li>

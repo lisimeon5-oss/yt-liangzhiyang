@@ -1,6 +1,7 @@
 {
   "data": {
     "list": [
+      {"id": 10030, "cate_id": 5, "type": 1, "name": "砍价活动", "url": "/pages/activity/bargain/index", "param": "", "example": "/pages/activity/bargain/index", "status": 1, "sort": 0},
       {
         "id": 1,
         "cate_id": 5,

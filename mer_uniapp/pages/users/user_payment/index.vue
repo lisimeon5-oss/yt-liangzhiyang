@@ -141,7 +141,7 @@
 				// 支付方式
 				this.$store.dispatch('getPayConfig').then((res) => {
 					this.nowMoney = res.userBalance;
-					let cartArrs = res.payConfig.filter(e => e.value !== 'yue');
+					let cartArrs = res.payConfig.filter(e => e.value !== 'yue' && e.value !== 'hdfk');
 					this.cartArr = cartArrs;
 					if (this.cartArr.length) {
 						this.payType = this.cartArr[0].value;

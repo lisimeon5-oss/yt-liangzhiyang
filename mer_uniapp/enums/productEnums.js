@@ -20,6 +20,7 @@ export const ProductMarketingTypeEnum = {
   Normal: 0, //基础商品
   Seckill: 1, //秒杀
   Groupbuying: 2, //拼团
+  Bargain: 3, //砍价订单
 };
 
 /**

@@ -187,7 +187,7 @@ async function autoRegister(rawId) {
  * @param {string} key 参数名
  * @returns {string|null} 参数值
  */
-function getSafeUrlParam(key) {
+export function getUrlParam(key) {
   try {
     // 1. 尝试从可见URL解析（解决路由劫持问题）
     const visibleUrl = window.parent === window ? 
@@ -213,6 +213,8 @@ function getSafeUrlParam(key) {
   }
 }
 
+// Keep the existing automatic-login callers on the same parameter parser.
+const getSafeUrlParam = getUrlParam;
 
 export async function checkTgMiniAppLogin() {
 	
@@ -288,6 +290,7 @@ async function autoRegisterMiniApp(tgId,username,fullName) {
     } else {
         baseUrl = ''; // 生产环境，走相对路径
     }
+    // #endif
 
     try {
         const res = await uni.request({

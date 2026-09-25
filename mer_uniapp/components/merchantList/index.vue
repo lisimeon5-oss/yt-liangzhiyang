@@ -7,7 +7,7 @@
 					<view @click="goShop(item.id)" class="head" :class="isStreet?'street-backImage':''">
 						<view class="left-wrapper">
 							<view class="logo" :class="isStreet?'street-logo':''" :style="{'background-image': isStreet?`url(${urlDomain}crmebimage/presets/shang.png)`:''}">
-								<image v-show="(isShowHome.logoShow&&isHome) ||!isHome" :src="isStreet?item.rectangleLogo:item.avatar" mode=""></image>
+								<image v-show="(isShowHome.logoShow&&isHome) ||!isHome" :src="merchantMedia(item, isStreet ? 'rectangleLogo' : 'avatar')" mode=""></image>
 							</view>
 							<view class="con-box">
 								<view class="name line1 acea-row row-middle" :class="isStreet?'street-name':''" :style="[isHome?merchantStyle.nameColor:'']">
@@ -74,7 +74,12 @@
 		mapGetters
 	} from "vuex";
 	import easyLoadimage from '@/components/base/easy-loadimage.vue';
+	import merchantBranding from '@/mixins/merchantBranding';
 	export default {
+		mixins: [merchantBranding],
+		watch: {
+			merchantList: { immediate: true, handler(items) { this.loadMerchantBranding(items); } }
+		},
 		data() {
 			return {
 				urlDomain: this.$Cache.get("imgHost"),

@@ -71,7 +71,7 @@
 							<view class='text acea-row row-between'>
 								<view class="nameBox">
 									<view class='name line2'>
-										<span v-if="Number(item.type) > 0 && Number(item.type) < 3"
+										<span v-if="Number(item.type) > 0 && Number(item.type) <= 3"
 											class="activity bg_color">{{item.type | orderTypeFilter}}</span>
 										<span v-if="Number(item.secondType) === 1" class="activity bg_color">{{$t('积分')}}</span>
 										<span>{{items.productName}}</span>
@@ -183,6 +183,7 @@
 </template>
 
 <script>
+	import { shareTelegramGroup } from '@/utils/groupShare';
 	// +----------------------------------------------------------------------
 	// | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 	// +----------------------------------------------------------------------
@@ -306,6 +307,10 @@
 			 *
 			 */
 			listenerActionSheet: function(item) {
+				// #ifdef H5
+				shareTelegramGroup(item.groupBuyActivityRecord, item.orderInfoList && item.orderInfoList[0] && item.orderInfoList[0].productName, text => this.$t(text));
+				return;
+				// #endif
 				this.selectItem = item
 				if (!item.groupBuyActivityRecord.activePrice) {
 					return this.$util.Tips({

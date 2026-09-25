@@ -36,7 +36,7 @@
 		</view>
 		<view v-if="isShow" class="titleNo">{{$t('暂无支付方式！')}}</view>
 		<view class="btn-box">
-			<button class='Bnt bg-color' @tap='getOrderPay' :disabled="isBuy">{{$t('立即支付')}}</button>
+			<button class='Bnt bg-color' @tap='getOrderPay' :disabled="isBuy || !payType">{{$t(payType === 'hdfk' ? '确认货到付款' : '立即支付')}}</button>
 		</view>
 		<view class="alipaysubmit" v-html="formContent"></view>
 	</view>
@@ -107,8 +107,8 @@
 			payConfig() {
 				uni.hideLoading();
 				// 支付方式
-				store.dispatch('getPayConfig').then((res) => {
-					this.cartArr = res.payConfig;
+				return store.dispatch('getPayConfig').then((res) => {
+					this.cartArr = res.payConfig.filter(item => item.payStatus === 1 && (this.fromType !== 'svip' || item.value !== 'hdfk'));
           this.userBalance = res.userBalance;
 					// if(this.fromType === 'svip') this.cartArr[1].payStatus = 0					
 					if (this.cartArr.length) {
@@ -116,11 +116,19 @@
 						this.payType = this.cartArr[0].value;
 						this.isShow = false;
 					} else {
+						this.active = null;
+						this.payType = '';
 						this.isShow = true;
 						return this.$util.Tips({
 							title: this.$t('暂无支付方式！')
 						})
 					}
+				}).catch(err => {
+					this.active = null;
+					this.payType = '';
+					this.cartArr = [];
+					this.isShow = true;
+					this.$util.Tips({ title: err });
 				});
 			},
 			payItem: Debounce(function(e,item) {
@@ -140,10 +148,14 @@
 			},
 			//选择支付方式的判断，传参
 			getPayCheck() {
-				if (!this.payType) return this.$util.Tips({
-					title: this.$t('请选择支付方式')
-				});
-				if (this.payType === 'yue') {
+				if (!this.payType) {
+					this.$util.Tips({ title: this.$t('请选择支付方式') });
+					return false;
+				}
+				if (this.payType === 'hdfk') {
+					// Keep the existing API channel contract; the server records COD as hdfk.
+					this.payChannel = 'h5';
+				} else if (this.payType === 'yue') {
 					this.payChannel = 'yue'
 				} else if (this.payType == 'alipay') {
 					// #ifdef H5
@@ -171,7 +183,7 @@
 			},
 			//立即支付
 			getOrderPay: Debounce(function() {
-				this.getPayCheck();
+				if (this.isBuy || this.getPayCheck() === false) return;
 				if (Number(this.payPrice)>Number(this.userBalance) && this.payType === 'yue') return this.$util.Tips({
 					title: this.$t('余额的金额不够，请切换支付方式')
 				});

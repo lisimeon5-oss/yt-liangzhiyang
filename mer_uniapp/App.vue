@@ -6,6 +6,7 @@
 		loginConfigApi
 	} from '@/api/public';
 	import Auth from './libs/wechat.js';
+	import { telegramBargainRoute, telegramGroupRoute } from '@/utils/bargainShare';
 	import Routine from './libs/routine.js';
 	import {
 		checkAutoLogin,getUrlParam,checkTgMiniAppLogin
@@ -246,45 +247,70 @@
 			store.commit('GLOBAL_DATA', JSON.parse(JSON.stringify(that.globalData)));
 		},
 		async mounted() {
-			this.initH5Auth(); 
+			// #ifdef H5
+			// Release Telegram's loading placeholder once the app shell is mounted.
+			// Images and the login request must not block showing the interface.
+			const telegram = window.Telegram && window.Telegram.WebApp;
+			if (telegram && typeof telegram.ready === 'function') {
+				try {
+					telegram.ready();
+				} catch (error) {
+					console.error('[Telegram ready]', error);
+				}
+			}
+			// #endif
+			try {
+				await this.initH5Auth();
+			} catch (error) {
+				console.error('[H5 auth initialization]', error);
+			}
 			//if (this.$store.getters.isLogin && !this.$Cache.get('USER_INFO')) await this.$store.dispatch('USERINFO');
 		},
 		methods: {
 			handleResize(e) {
 				/* 窗口宽度大于430px且不在PC页面且不在移动设备时跳转至 PC.html 页面 */
-				if (e.size.windowWidth > 430 && !/iOS|Android/i.test(e.system)) {
+				if (!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) && e.size.windowWidth > 430 && !/iOS|Android/i.test(e.system)) {
 					// window.location.pathname = 'https://java.crmeb.net/';
 					/* 若你的项目未设置根目录（默认为 / 时），则使用下方代码 */
 					window.location.pathname = '/static/html/pc.html';
 				}
 			},
-			// H5环境认证初始化
-			 async initH5Auth(option) {
-			     // 跳过登录页
-			     if (window.location.pathname.includes('/pages/users/login/index')) return;
-			 
-			     // 检查登录状态（会自动处理URL中的id参数）
-			    //const isLoggedIn = await checkAutoLogin();
+			// Preserve the Mini App destination until the recipient's login completes.
+			async initH5Auth() {
+				// #ifdef H5
+				if (this._telegramLoginPending) return this._telegramLoginPending;
+				this._telegramLoginPending = this.finishTelegramLaunch();
+				try { return await this._telegramLoginPending; }
+				finally { this._telegramLoginPending = null; }
+				// #endif
+			},
+			async finishTelegramLaunch() {
+				// #ifdef H5
+				if (window.location.pathname.includes('/pages/users/login/index')) return;
+				const tg = window.Telegram && window.Telegram.WebApp;
+				const saved = window.__mallTelegramStart ? '?tgWebAppStartParam=' + encodeURIComponent(window.__mallTelegramStart) : '';
+				const route = telegramBargainRoute(tg, window.location.search || saved, window.location.hash) || telegramGroupRoute(tg, window.location.search || saved, window.location.hash) || telegramBargainRoute(null, saved) || telegramGroupRoute(null, saved);
+				if (route && this._telegramHandledRoute === route) return;
+				if (!route && this._telegramAuthCompleted) return;
 				const isLoggedIn = await checkTgMiniAppLogin();
-			     if (!isLoggedIn && !getUrlParam('id')) {
-			       this.redirectToLogin();
-			     }
-			   },
-			   async initH5Auth() {
-			       // 跳过登录页
-			       if (window.location.pathname.includes('/pages/users/login/index')) return;
-			   
-			       // 检查登录状态（会自动处理URL中的id参数）
-			      //const isLoggedIn = await checkAutoLogin();
-			   				const isLoggedIn = await checkTgMiniAppLogin();
-			       if (!isLoggedIn && !getUrlParam('id')) {
-			         this.redirectToLogin();
-			       }
-			     }
+				this._telegramAuthCompleted = isLoggedIn;
+				if (route && isLoggedIn) {
+					await new Promise(resolve => this.$nextTick(resolve));
+					if (this.$router && this.$router.onReady) await new Promise((resolve,reject) => this.$router.onReady(resolve,reject));
+					await new Promise((resolve,reject) => uni.reLaunch({ url: route, success: resolve, fail: reject }));
+					this._telegramHandledRoute = route;
+					delete window.__mallTelegramStart;
+				} else if (!isLoggedIn && !getUrlParam('id') && typeof this.redirectToLogin === 'function') {
+					this.redirectToLogin();
+				}
+				// #endif
+			}
 		},
 		onShow: function() {
 			// #ifdef H5
 			uni.onWindowResize(this.handleResize);
+			// App lifecycle is the reliable entry point when Telegram resumes its WebView.
+			this.$nextTick(() => this.initH5Auth().catch(error => console.error('[Telegram launch]', error)));
 			// #endif
 		},
 		onUnload() {

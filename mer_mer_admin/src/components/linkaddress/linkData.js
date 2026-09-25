@@ -5,6 +5,7 @@ const JavaMerchantId = Cookies.get('JavaMerchantId');
 
 export const linkData = {
   list: [
+    { id: 30, type: 1, name: '砍价活动', url: `/pages/activity/bargain/index?merId=${JavaMerchantId}` },
     {
       id: 1,
       type: 1,

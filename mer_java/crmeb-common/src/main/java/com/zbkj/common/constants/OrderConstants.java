@@ -13,6 +13,8 @@ package com.zbkj.common.constants;
  * +----------------------------------------------------------------------
  */
 public class OrderConstants {
+    public static final Integer ORDER_TYPE_BARGAIN = 3;
+    public static final String PLACE_ORDER_TYPE_BARGAIN = "bargain";
 
     /** 订单号前缀-平台 */
     public static final String ORDER_PREFIX_PLATFORM = "PT";

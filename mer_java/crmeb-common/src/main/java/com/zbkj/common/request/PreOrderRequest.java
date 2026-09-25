@@ -31,7 +31,7 @@ public class PreOrderRequest {
 
     @ApiModelProperty(value = "预下单类型（“shoppingCart”:购物车下单,“buyNow”:立即购买,“video”: 视频号商品下单,“seckill”:秒杀下单,“group”:拼团下单）", required = true)
     @NotBlank(message = "预下单类型不能为空")
-    @StringContains(limitValues = {"shoppingCart", "buyNow", "video", "seckill","group"}, message = "未知的预下单类型")
+    @StringContains(limitValues = {"shoppingCart", "buyNow", "video", "seckill","group","bargain"}, message = "未知的预下单类型")
     private String preOrderType;
 
     @ApiModelProperty(value = "下单详情列表", required = true)

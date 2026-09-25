@@ -274,8 +274,9 @@ export default {
       if (this.tagsViewList.some((v) => v.path === path)) return false;
       const item = this.tagsViewList.find((v) => v.path === path);
       if (to) {
-        this.tagsViewList.push({ ...to });
-        this.addBrowserSetSession(this.tagsViewList);
+        // Route.matched contains component instances and circular parent records.
+        const { name, path, query, params, meta } = to;
+        this.addTag({ route: { name, path, query, params, meta }, type: 'push' });
       }
     },
     // 右键菜单点击时显示菜单列表

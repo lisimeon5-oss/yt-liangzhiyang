@@ -288,6 +288,7 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Myanmar", "Myanmar Text", "Microsoft YaHei", sans-serif;
 		.con-box {
 			flex: 1;
 			display: flex;
@@ -335,23 +336,28 @@
 		background-color: #fff;
 		overflow-y: auto;
 		overflow-x: hidden;
-		width: 200rpx;
+		width: 216rpx;
+		flex: 0 0 216rpx;
 		height: 100%;
 		overflow: hidden;
 	}
 	.productSort .aside .item {
-		height: 100rpx;
+		min-height: 128rpx;
+		box-sizing: border-box;
+		padding: 20rpx 16rpx;
+		border-left: 4rpx solid transparent;
 		width: 100%;
-		font-size: 26rpx;
+		font-size: 24rpx;
+		line-height: 40rpx;
+		text-align: center;
 		color: #424242;
 	}
 	.productSort .aside .item_text {
-		padding-left: 20rpx;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
+		width: 100%;
+		display: block;
+		white-space: normal;
+		word-break: normal;
+		overflow-wrap: anywhere;
 	}
 	.productSort .aside .item.on {
 		background-color: #f7f7f7;
@@ -363,6 +369,7 @@
 	}
 	.productSort .conter {
 		flex: 1;
+		min-width: 0;
 		height: 100%;
 		padding: 0 14rpx;
 		background-color: #f7f7f7;
@@ -396,7 +403,9 @@
 		padding-bottom: 26rpx;
 	}
 	.productSort .conter .list .item {
-		width: 174rpx;
+		width: 33.333333%;
+		min-width: 0;
+		box-sizing: border-box;
 		margin-top: 26rpx;
 	}
 	.productSort .conter .list .item .picture,

@@ -275,7 +275,7 @@
 					<group-doing :processItem="groupBuyActivityResponse.processItem"
 						:groupBuyActivityResponse="groupBuyActivityResponse" @toGroup="toGroup" v-if="
               marketingType === ProductMarketingTypeEnum.Groupbuying &&
-              groupBuyActivityResponse.showGroup
+              groupBuyActivityResponse.showGroup && !invitedGroupRecordId
             "></group-doing>
 					<!-- 拼团玩法 -->
 					<group-playing v-if="marketingType === ProductMarketingTypeEnum.Groupbuying"></group-playing>
@@ -923,6 +923,8 @@
 				groupActivityId: "",
 				buyLimitNum: "",
 				groupRecordId: 0,
+				invitedGroupRecordId: 0,
+				pendingGroupJoin: false,
 				isPink: 0,
 				skuImage: [] //规格小图
 			};
@@ -949,7 +951,7 @@
 		watch: {
 			isOpen(nVal) {
 				if (!nVal && this.isPink) {
-					this.groupRecordId = 0;
+					this.groupRecordId = this.invitedGroupRecordId || 0;
 				}
 			},
 			i18nLocale() {
@@ -1006,7 +1008,10 @@
 			if (options.status) this.seckillStatus = Number(options.status); //秒杀状态
 			if (options.datatime) this.seckillTime = Number(options.datatime); //秒杀时间
 			if (options.gd) this.groupActivityId = options.gd; //拼团活动id
-			if (options.rd) this.groupRecordId = options.rd; //是否为参团
+			if (/^[1-9]\d*$/.test(String(options.rd || ''))) {
+				this.groupRecordId = this.invitedGroupRecordId = options.rd;
+				this.pendingGroupJoin = true;
+			}
 			if (options.sd) this.$store.commit('Change_Spread', options.sd); //分享id
 
 			//获取浏览器中的参数，商品id，商品类型type，普通normal，秒杀seckill，砍价，拼团，视频号video
@@ -1030,7 +1035,10 @@
 				this.marketingType = Number(value.mt);
 				if(value.sd) this.$store.commit('Change_Spread', value.sd);
 				if (value.gd) this.groupActivityId = value.gd; //拼团活动id
-				if (value.rd) this.groupRecordId = value.rd; //是否为参团
+				if (/^[1-9]\d*$/.test(String(value.rd || ''))) {
+					this.groupRecordId = this.invitedGroupRecordId = value.rd;
+					this.pendingGroupJoin = true;
+				}
 				//this.type = value.type ? value.type : 'normal';
 			}
 			//商品类型存入vuex中
@@ -1126,9 +1134,9 @@
 			},
 			//去拼团
 			toGroup(e) {
-				this.goBuy();
-				this.groupRecordId = e;
+				this.groupRecordId = this.invitedGroupRecordId || e;
 				this.isPink = 1;
+				this.goBuy();
 			},
 			buyLimit(e) {
 				this.buyLimitNum = e;
@@ -1514,6 +1522,10 @@
 						that.downloadFilestoreImage();
 						// #endif
 						that.DefaultSelect();
+						if (this.pendingGroupJoin && this.marketingType === ProductMarketingTypeEnum.Groupbuying) {
+							this.pendingGroupJoin = false;
+							this.$nextTick(() => this.goBuy());
+						}
 						this.showSkeleton = false;
 						setTimeout(() => {
 							this.defaultCoupon = this.coupon.list;

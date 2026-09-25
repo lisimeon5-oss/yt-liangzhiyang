@@ -16,6 +16,7 @@ import {
   setTagNavListInLocalstorage,
   // getMenuByRouter,
   getTagNavListFromLocalstorage,
+  toNavTag,
   getHomeRoute,
   getNextRoute,
   routeHasExist,
@@ -244,7 +245,7 @@ export default {
     setTagNavList(state, list) {
       let tagList = [];
       if (list.length) {
-        tagList = [...list];
+        tagList = list.map(toNavTag);
       }
       state.tagNavList = tagList;
       setTagNavListInLocalstorage([...tagList]);

@@ -1,4 +1,10 @@
 export default {
+  "Telegram邀请链接已复制": "Telegram invitation link copied",
+  "货到付款": "Cash on delivery",
+  "收货时付款": "Pay when you receive your order",
+  "确认货到付款": "Confirm cash on delivery",
+  "分类": "Categories",
+  "店铺街": "Stores",
   "可以不填": "Optional",
   "必填": "Required",
   "联系飞机": "Telegram",

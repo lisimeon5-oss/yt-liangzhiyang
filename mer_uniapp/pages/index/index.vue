@@ -41,7 +41,8 @@
 							<!-- 店铺街 -->
 							<merchant-list v-if="item.name == 'homeMerchant'" :dataConfig="item"></merchant-list>
 							<!-- 拼团 -->
-							<group v-if="item.name == 'group'" :dataConfig="item"></group>
+							<home-bargain v-if="item.name === 'bargain'" :dataConfig="item"></home-bargain>
+						<group v-if="item.name == 'group'" :dataConfig="item"></group>
 							<!-- 积分 -->
 							<intergralShop v-if="item.name == 'intergral'" :dataConfig="item"></intergralShop>
 							<!-- 辅助线 -->
@@ -169,6 +170,7 @@
 	import blankPage from '@/components/homeIndex/blankPage';
 	import homeTitle from '@/components/homeIndex/title';
 	import hotSpot from '@/components/homeIndex/hotSpot.vue';
+	import homeBargain from "@/components/homeIndex/bargain.vue";
 	import group from "@/components/homeIndex/group.vue";
 	import pageFooter from "@/components/pageFooter/index.vue";
 	import intergralShop from "@/components/homeIndex/intergralShop.vue";
@@ -227,6 +229,7 @@
 			blankPage,
 			homeTitle,
 			hotSpot,
+			homeBargain,
 			group,
 			intergralShop
 		},

@@ -45,4 +45,6 @@ public class PreOrderDetailRequest {
     @ApiModelProperty(value = "拼团记录id，营销类型2=拼团 时必填 0=开团 实际recordId=拼团")
     private Integer groupBuyRecordId = 0;
 
+    private Integer bargainRecordId;
+
 }

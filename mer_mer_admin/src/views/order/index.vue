@@ -95,6 +95,7 @@
             <div class="acea-row">
               <font v-show="scope.row.type === 1" class="mr5">[{{ $t('order.spike') }}]</font>
               <font v-show="scope.row.type === 2" class="mr5">[{{ $t('order.groupBuy') }}]</font>
+              <font v-show="scope.row.type === 3" class="mr5">[{{ $t('bargain.title') }}]</font>
               <span style="display: block" v-text="scope.row.orderNo" />
             </div>
             <div class="flex">
@@ -383,6 +384,7 @@ export default {
         { value: '0', text: this.$t('order.normal') },
         { value: '1', text: this.$t('order.spike') },
         { value: '2', text: this.$t('order.groupBuy') },
+          { value: '3', text: this.$t('bargain.title') },
       ];
     },
   },

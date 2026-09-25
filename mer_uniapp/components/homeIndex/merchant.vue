@@ -17,18 +17,18 @@
 				<view class='item' v-for="(item,index) in merList" :key='index'>
 					<navigator :url="`/pages/merchant/home/index?merId=${item.id}`" hover-class="none">
 						<view class='pic tui-skeleton-rect'>
-							<easy-loadimage :image-src="item.coverImage"
+							<easy-loadimage :image-src="merchantMedia(item, 'coverImage')"
 								:radius="dataConfig.contentStyle.val"></easy-loadimage>
 						</view>
 						<image class="lines left" :src="urlDomain+'crmebimage/presets/lianjie.png'"></image>
 						<view v-show="logoShow" class='logo tui-skeleton-rect'>
-							<image :src='item.rectangleLogo'></image>
+							<image :src="merchantMedia(item, 'rectangleLogo')"></image>
 						</view>
 						<image class="lines right" :src="urlDomain+'crmebimage/presets/lianjie.png'"></image>
 						<view class='merName tui-skeleton-rect'>
 							<view class='neme line1 line-heightOne' v-show="nameShow" :style="[nameColor]">{{item.name}}</view>
 							<view v-show="typeShow"><text class='label'
-									:style="[labelColor]">{{item.typeId | merchantTypeFilter}}</text></view>
+									:style="[labelColor]">{{merchantTypeLabel(item)}}</text></view>
 						</view>
 					</navigator>
 				</view>
@@ -57,9 +57,14 @@
 	import merCard from '@/components/merchantList/index.vue'
 	import easyLoadimage from '@/components/base/easy-loadimage.vue';
 	import { getLocalizedDiyVal, getLocalizedDiyUrl } from '@/utils/localizedName';
+	import merchantBranding from '@/mixins/merchantBranding';
 	let app = getApp()
 	export default {
 		name: 'merchantList',
+		mixins: [merchantBranding],
+		watch: {
+			merList: { immediate: true, handler(items) { this.loadMerchantBranding(items); } }
+		},
 		props: {
 			dataConfig: {
 				type: Object,

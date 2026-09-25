@@ -65,9 +65,8 @@ export default {
   },
   watch: {
     // 监听 vuex 数据变化
-    '$store.state': {
-      handler(val) {
-        if (val.user.menuListlength === this.menuList.length) return false;
+    '$store.state.user.menuList': {
+      handler() {
         this.setFilterRoutes();
       },
       deep: true,

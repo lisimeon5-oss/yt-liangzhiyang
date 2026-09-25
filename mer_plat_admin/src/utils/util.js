@@ -161,14 +161,27 @@ export const showTitle = (item, vm) => {
  * @description 本地存储和获取标签导航列表
  */
 export const setTagNavListInLocalstorage = (list) => {
-  localStorage.setItem('tagNaveListJavaPlat', JSON.stringify(list));
+  try {
+    localStorage.setItem('tagNaveListJavaPlat', JSON.stringify(list.map(toNavTag)));
+  } catch (error) {
+    // A full/disabled browser cache must not interrupt navigation.
+    console.warn('[navigation] Unable to save tabs', error);
+  }
+};
+export const toNavTag = (route) => {
+  const { name, path, query, params, meta, title, icon } = route;
+  return { name, path, query, params, meta, title, icon };
 };
 /**
  * @returns {Array} 其中的每个元素只包含路由原信息中的name, path, meta三项
  */
 export const getTagNavListFromLocalstorage = () => {
-  const list = localStorage.getItem('tagNaveListJavaPlat');
-  return list ? JSON.parse(list) : [];
+  try {
+    const list = JSON.parse(localStorage.getItem('tagNaveListJavaPlat') || '[]');
+    return Array.isArray(list) ? list.filter((tag) => tag && typeof tag.path === 'string').map(toNavTag) : [];
+  } catch (error) {
+    return [];
+  }
 };
 
 /**

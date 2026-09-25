@@ -1,12 +1,12 @@
 <template>
 	<view id="store" class="store" :style="[isHome?contentStyle:'']">
 		<view class='pictrue'>
-			<image :style="[isHome?logoStyleRadius:'']" :src="merchantInfo.avatar" class=""></image>
+			<image :style="[isHome?logoStyleRadius:'']" :src="localizedLogo" class=""></image>
 		</view>
 		<view class="text">
 			<navigator :url="`/pages/merchant/${type}/index?merId=${merId}`" hover-class="none">
 				<view class="flex merchantInfo">
-					<text class="name" :style="!isHome?'color: #FFFFFF;':''">{{merchantInfo.name}}</text>
+					<text class="name" :style="!isHome?'color: #FFFFFF;':''">{{localizedMerchantName}}</text>
 					<text v-if="isShowTypeId" class="iconfont icon-jiantou"></text>
 				</view>
 			</navigator>
@@ -14,7 +14,7 @@
 				<text v-if="merchantInfo.isSelf"
 					class="font-bg-red bt-color bg-color mr10 self_min merType">{{$t('自营')}}</text>
 				<text v-if="isShowTypeId && merchantInfo.typeId"
-					class="bt-color mr10 merType color-FAAD14">{{merchantInfo.typeId | merchantTypeFilter}}</text>
+					class="bt-color mr10 merType color-FAAD14">{{localizedMerchantType}}</text>
 				<view class='starsList'>
 					<block v-for="(itemn, indexn) in merchantInfo.starLevel" :key="indexn">
 						<text class='iconfont icon-pingfen font-color'></text>
@@ -60,9 +60,31 @@
 	import {
 		toLogin
 	} from '@/libs/login.js';
+	import { getLocalizedText } from '@/utils/localizedName';
+	import merchantBrandingMixin from '@/mixins/merchantBranding';
 	export default {
+		mixins: [merchantBrandingMixin],
+		watch: {
+			merId: { immediate: true, handler(id) { if (id) this.loadMerchantBranding([{ id }]); } }
+		},
 		computed: {
 			...mapGetters(["merchantClassify", "merchantType", 'isLogin', 'uid']),
+			merchantBranding() {
+				const branding = this.dataConfig && this.dataConfig.merchantBranding;
+				return branding && String(branding.merId) === String(this.merId) ? branding : (this.merchantBrandingById[String(this.merId)] || {});
+			},
+			localizedLogo() {
+				return getLocalizedText(this.merchantInfo.avatar, this.merchantBranding.logoJson, this.i18nLocale);
+			},
+			localizedMerchantName() {
+				return getLocalizedText(this.merchantInfo.name, this.merchantInfo.nameJson, this.i18nLocale);
+			},
+			localizedMerchantType() {
+				const type = (this.merchantType || []).find(item => String(item.id) === String(this.merchantInfo.typeId));
+				const branding = this.merchantBranding;
+				const json = String(branding.typeId) === String(this.merchantInfo.typeId) ? branding.typeNameJson : type && type.nameJson;
+				return getLocalizedText(type ? this.$t(type.name || '') : '', json, this.i18nLocale);
+			},
 			//头像圆角
 			logoStyleRadius() {
         if(this.dataConfig) {

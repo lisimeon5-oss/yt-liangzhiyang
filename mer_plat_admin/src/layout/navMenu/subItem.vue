@@ -15,7 +15,7 @@
         <sub-item :chil="val.children" />
       </el-submenu>
       <template v-else>
-        <el-menu-item :index="val.path" :key="'i-' + (val.id || val.path)" @click.native="onMenuClick(val)">
+        <el-menu-item :index="val.path" :key="'i-' + (val.id || val.path)">
           <template>
             <i class="ivu-icon" :class="val.icon ? 'el-icon-' + val.icon : ''"></i>
             <span>{{ val.title }}</span>
@@ -35,13 +35,6 @@ export default {
       default() {
         return [];
       },
-    },
-  },
-  methods: {
-    onMenuClick(val) {
-      if (!val || !val.path) return;
-      if (this.$route.path === val.path) return;
-      this.$router.push(val.path).catch(() => {});
     },
   },
 };

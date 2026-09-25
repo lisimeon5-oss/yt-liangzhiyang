@@ -8,7 +8,7 @@
 			<view v-for="(item, index) in tabs" :key="index" :class="{ active: tabActive === index }" class="item"
 				@click="handleChangetab(index)">
 				<view :class="['iconfont', item.icon]"></view>
-				<view>{{ item.name }}</view>
+				<view>{{ $t(item.name) }}</view>
 			</view>
 			<view class="item" @click="handleCustomer">
 				<view class="iconfont icon-kefu_o"></view>

@@ -122,6 +122,7 @@ const marketingRouter = {
         },
       ],
     },
+    { path: 'bargain', component: () => import('@/views/marketing/bargain/index'), name: 'BargainActivities', meta: { title: '砍价活动', icon: '' } },
     {
       path: 'atmosphere',
       name: 'atmosphere',

@@ -95,7 +95,7 @@ export default {
         this.configNme === 'placeWords' ||
         (this.configNme === 'titleConfig' &&
           (name === 'homeMerchant' ||
-            name === 'seckill' ||
+            name === 'bargain' || name === 'seckill' ||
             name === 'group' ||
             name === 'intergral' ||
             name === 'homeDiscover')) ||
@@ -106,7 +106,7 @@ export default {
     useParentLang() {
       return (
         this.defaults &&
-        (this.defaults.name === 'seckill' ||
+        (this.defaults.name === 'bargain' || this.defaults.name === 'seckill' ||
           this.defaults.name === 'group' ||
           this.defaults.name === 'intergral' ||
           this.defaults.name === 'homeDiscover') &&

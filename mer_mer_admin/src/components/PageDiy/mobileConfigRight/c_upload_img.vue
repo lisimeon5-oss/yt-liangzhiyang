@@ -50,13 +50,13 @@ export default {
     isVideoMediaI18n() {
       const name = this.defaults && this.defaults.name;
       if (name === 'group') return this.configNme === 'logoConfig';
-      return name === 'video' || name === 'seckill';
+      return name === 'video' || name === 'bargain' || name === 'seckill';
     },
     isIconI18n() {
       const name = this.defaults && this.defaults.name;
       if (name === 'group') return this.configNme === 'logoConfig';
       return (
-        name === 'homeMerchant' || name === 'news' || name === 'video' || name === 'seckill'
+        name === 'homeMerchant' || name === 'news' || name === 'video' || name === 'bargain' || name === 'seckill'
       );
     },
     mediaLang() {

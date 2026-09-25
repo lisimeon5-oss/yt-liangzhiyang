@@ -22,6 +22,10 @@ INSERT INTO `eb_system_language` (`name`, `code`, `is_default`, `status`, `sort`
 -- 新增业务名称 *_json 后，必须在 I18nJsonColumnRegistry 登记表名与列名，模糊搜索才会自动 OR JSON 列。
 
 -- 商品多语言名称字段
+-- 旧版商品表使用 COMPACT，新增多语言列前转为 DYNAMIC，减少长字段的行内占用。
+-- 该操作会重建商品表；已有数据库请先备份，在低峰期执行。
+ALTER TABLE `eb_product` ROW_FORMAT = DYNAMIC;
+
 ALTER TABLE `eb_product` ADD COLUMN `name_json` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '多语言商品名称(JSON)' AFTER `name`;
 
 -- 商品多语言单位字段

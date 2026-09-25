@@ -229,6 +229,7 @@
 	</view>
 </template>
 <script>
+	import { shareTelegramGroup } from '@/utils/groupShare';
 	import {
 		HTTP_H5_URL
 	} from "@/config/app.js";
@@ -482,6 +483,10 @@
 			 *
 			 */
 			listenerActionSheet: function() {
+				// #ifdef H5
+				shareTelegramGroup(this.allData.recordForShare, '', text => this.$t(text));
+				return;
+				// #endif
 				this.goPoster()
 				this.posters = true;
 				// #ifdef H5
